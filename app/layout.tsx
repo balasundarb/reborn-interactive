@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import StoreProvider from "@/lib/providers/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,19 +16,25 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RebornInteractive",
   description: "Game Designing company.",
+  icons: {
+
+    apple: "/favicon-180x180.png",
+  },
+  manifest: "/manifest.json",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );
