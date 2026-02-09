@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-red: #ff3b30;
+  --primary-red-dark: #d63031;
+  --secondary-red: #ff6b6b;
+  --accent-red: #ff4757;
+  --light-bg: #ffffff;
+  --dark-bg: #0a0a0a;
 }
 
 @theme inline {
@@ -12,15 +16,56 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+
+  ::selection {
+    @apply bg-red-500/30 text-white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-primary {
+    @apply relative px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-lg
+           transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30
+           active:scale-95 overflow-hidden;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2 border-2 border-red-500 text-red-500 font-semibold rounded-lg
+           transition-all duration-300 hover:bg-red-500 hover:text-white
+           hover:shadow-lg hover:shadow-red-500/20;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl
+           shadow-2xl shadow-red-500/10;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent;
+  }
+
+  .pulse-ring {
+    @apply absolute inset-0 rounded-full border-2 border-red-500 animate-ping;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-red-500 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-red-600;
 }
