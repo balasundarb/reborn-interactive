@@ -131,7 +131,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-black;
 }
 
 ::-webkit-scrollbar-thumb {

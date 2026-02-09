@@ -23,10 +23,6 @@ export const applyTheme = (theme: 'light' | 'dark') => {
 
     localStorage.setItem(THEME_KEY, theme)
 
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) {
-        meta.setAttribute('content', theme === 'dark' ? '#1a1a1a' : '#ffffff')
-    }
 }
 
 
