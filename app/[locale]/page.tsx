@@ -1,14 +1,15 @@
-// app/[locale]/page.tsx (or your home page file)
+// app/[locale]/page.tsx
 "use client";
 import { useTranslations } from "next-intl";
 import Component from "@/components/ui/retro-grid";
 import Team from "@/components/homepage/team";
+import { ParticleTextEffect } from "@/components/ui/particle-text-effect";
 
 const HomePage = () => {
   const t = useTranslations('HomePage');
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden">
+    <>
       {/* Retro Grid Background */}
       <Component
         gridColor="#d63031"
@@ -18,19 +19,18 @@ const HomePage = () => {
       />
 
       {/* Hero Section */}
-      <div className="relative z-10 flex items-center justify-center h-screen">
+      <div id="home" className="relative z-10 flex items-center justify-center h-screen">
         <div className="flex justify-center">
-          <img 
-            src="/favicon-384x384.png" 
-            alt="Re-born Interactive" 
-            className="h-auto w-auto" 
-          />
+          {/* Your hero content */}
+           <ParticleTextEffect />
         </div>
       </div>
 
-      {/* Testimonials Section */}
-      <Team />
-    </div>
+      {/* Team Section */}
+      <div id="team">
+        <Team />
+      </div>
+    </>
   );
 };
 
