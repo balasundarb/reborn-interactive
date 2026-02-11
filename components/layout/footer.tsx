@@ -132,7 +132,7 @@ const Footer: React.FC = () => {
                                                     }
                                                     placeholder="youremail@gmail.com"
                                                     required
-                                                    className="w-full bg-black/60 border border-white/10 py-4 px-5 text-sm text-white outline-none transition-all duration-300 placeholder:text-gray-600 font-mono focus:border-[#d63031]/50 focus:shadow-[0_0_15px_rgba(214,48,49,0.2)] group-hover/input:border-white/20"
+                                                    className="w-full bg-black/60 border py-4 px-5 text-sm text-white outline-none transition-all duration-300 placeholder:text-gray-600 font-mono border-[#d63031]/50 focus:border-[#d63031]/80 focus:shadow-[0_0_15px_rgba(214,48,49,0.2)] group-hover/input:border-white/20"
                                                 />
                                                 {/* Input Glow on Focus */}
                                                 <div className="absolute inset-0 border border-[#d63031]/0 pointer-events-none transition-all duration-300 focus-within:border-[#d63031]/30" />
