@@ -52,7 +52,7 @@ export function NavbarDemo() {
           <div className="flex items-center gap-4">
              <NavbarButton variant="secondary"><Languages /></NavbarButton>
          
-            <NavbarButton variant="primary">Login</NavbarButton>
+            <NavbarButton variant="primary" href="/login">Login</NavbarButton>
           </div>
         </NavBody>
 
