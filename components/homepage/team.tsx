@@ -3,7 +3,7 @@
 import React from "react";
 import { CircularTestimonials } from '@/components/ui/circular-testimonials';
 
-const testimonials = [
+const team = [
   {
     quote:
       "Leading Re-born Interactive has been an incredible journey. Our team's passion for creating immersive gaming experiences drives everything we do. We're committed to pushing creative boundaries.",
@@ -23,7 +23,7 @@ const testimonials = [
       "Being part of this dynamic team has accelerated my growth as a developer. Every project is a learning opportunity, and I'm excited to contribute to our innovative solutions.",
     name: "Shekinah Florance M",
     designation: "Junior Developer",
-    src: "/team/sekinah.webp",
+    src: "/team/Shekinah.jpg",
   },
   {
     quote:
@@ -75,27 +75,24 @@ const Team = () => {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Meet Our Team
-          </h2>
-          <p className="text-gray-300 text-lg">
-            Passionate professionals crafting extraordinary experiences
-          </p>
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4">
+  Meet Our Team
+</h2>
         </div>
 
         {/* Team Display */}
         <div className="flex items-center justify-center">
           <div className="w-full max-w-[1024px]">
             <CircularTestimonials
-              testimonials={testimonials}
+              testimonials={team}
               autoplay={true}
               colors={{
                 name: "#f7f7ff",
                 designation: "#e1e1e1",
                 testimony: "#f1f1f7",
-                arrowBackground: "#d63031",
+                arrowBackground: "#ff3b30",
                 arrowForeground: "#ffffff",
-                arrowHoverBackground: "#f7f7ff",
+                arrowHoverBackground: "#d63031",
               }}
               fontSizes={{
                 name: "28px",

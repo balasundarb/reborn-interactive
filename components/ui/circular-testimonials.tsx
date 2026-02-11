@@ -215,7 +215,7 @@ export const CircularTestimonials = ({
                 {activeTestimonial.designation}
               </p>
               <motion.p
-                className="quote"
+                className="quote "
                 style={{ color: colorTestimony, fontSize: fontSizeQuote }}
               >
                 {activeTestimonial.quote.split(" ").map((word, i) => (

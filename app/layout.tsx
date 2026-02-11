@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RebornInteractive",
+  title: "Re-born Interactive",
   description: "Game Designing company.",
   icons: {
 

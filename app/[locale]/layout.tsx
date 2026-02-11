@@ -1,7 +1,11 @@
+// app/[locale]/layout.tsx
+
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
+import { NavbarDemo } from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 
 type Props = {
     children: React.ReactNode;
@@ -14,10 +18,15 @@ export default async function LocaleLayout({ children, params }: Props) {
         notFound();
     }
 
-    setRequestLocale(locale)
+    setRequestLocale(locale);
+    
     return (
-        <>
-            {children}
-        </>
-    )
+        <div className="relative w-full min-h-screen overflow-x-hidden">
+            <NavbarDemo />
+            <main>
+                {children}
+            </main>
+            <Footer />
+        </div>
+    );
 }

@@ -141,6 +141,12 @@ interface ParticleTextEffectProps {
 const DEFAULT_WORDS = ["Welcome", "Re-born", "Interactive"]
 
 export function ParticleTextEffect({ words = DEFAULT_WORDS }: ParticleTextEffectProps) {
+const COLORS =  [
+  { r: 255, g: 59,  b: 48 },   // --primary-red (#ff3b30)
+  { r: 214, g: 48,  b: 49 },   // --primary-red-dark (#d63031)
+ // { r: 255, g: 107, b: 107 },  // --secondary-red (#ff6b6b)
+ // { r: 255, g: 71,  b: 87 },   // --accent-red (#ff4757)
+];
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
   const particlesRef = useRef<Particle[]>([])
@@ -192,12 +198,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS }: ParticleTextEffect
     const pixels = imageData.data
 
     // Generate new color
-    const newColor = {
-      r: Math.random() * 255,
-      g: Math.random() * 255,
-      b: Math.random() * 255,
-    }
-
+// With this:
+const newColor = COLORS[wordIndexRef.current % COLORS.length]
     const particles = particlesRef.current
     let particleIndex = 0
 
@@ -270,9 +272,7 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS }: ParticleTextEffect
     const particles = particlesRef.current
 
     // Background with motion blur
-    ctx.fillStyle = "rgba(0, 0, 0, 0.1)"
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
+ctx.clearRect(0, 0, canvas.width, canvas.height)
     // Update and draw particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const particle = particles[i]
@@ -368,18 +368,13 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS }: ParticleTextEffect
   }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
+    <div className=" items-center justify-center min-h-screen p-4">
       <canvas
         ref={canvasRef}
-        className="border border-gray-800 rounded-lg shadow-2xl"
-        style={{ maxWidth: "100%", height: "auto" }}
+        className=""
+        style={{ maxWidth: "auto", height: "auto" }}
       />
-      <div className="mt-4 text-white text-sm text-center max-w-md">
-        <p className="mb-2">Particle Text Effect</p>
-        <p className="text-gray-400 text-xs">
-          Right-click and hold while moving mouse to destroy particles • Words change automatically every 4 seconds
-        </p>
-      </div>
+   
     </div>
   )
 }
