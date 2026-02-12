@@ -1,4 +1,4 @@
-// app/[locale]/page.tsx
+// app/[locale]/(main)/page.tsx
 "use client";
 import { useTranslations } from "next-intl";
 import Component from "@/components/ui/retro-grid";
