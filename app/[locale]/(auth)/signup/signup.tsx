@@ -147,13 +147,20 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       {/* Social Options */}
       <div className="flex gap-4">
-        <button 
-          type="button"
-          onClick={() => onSocialSignup?.('google')} 
-          className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
-        >
-          <Chrome size={20} className="group-hover:scale-110 transition-transform" />
-        </button>
+<button 
+  type="button"
+  onClick={async () => {
+    if (onSocialSignup) {
+      onSocialSignup('google');
+    } else {
+      const { authClient } = await import('@/lib/auth-client');
+      await authClient.signIn.social({ provider: 'google' });
+    }
+  }} 
+  className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
+>
+  <Chrome size={20} className="group-hover:scale-110 transition-transform" />
+</button>
         <button 
           type="button"
           onClick={() => onSocialSignup?.('github')} 

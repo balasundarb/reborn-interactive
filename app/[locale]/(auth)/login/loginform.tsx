@@ -112,7 +112,17 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
       {/* Compact Social Grid */}
       <div className="grid grid-cols-3 gap-4">
-        <SocialButton onClick={() => onSocialLogin?.('google')} icon={<Chrome size={20} />} />
+   <SocialButton 
+  onClick={async () => {
+    if (onSocialLogin) {
+      onSocialLogin('google');
+    } else {
+      const { authClient } = await import('@/lib/auth-client');
+      await authClient.signIn.social({ provider: 'google' });
+    }
+  }} 
+  icon={<Chrome size={20} />} 
+/>
         <SocialButton onClick={() => onSocialLogin?.('github')} icon={<Github size={20} />} />
         <SocialButton 
           onClick={() => onSocialLogin?.('apple')} 
