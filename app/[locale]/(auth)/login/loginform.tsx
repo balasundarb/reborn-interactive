@@ -79,9 +79,13 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
                 </div>
 
                 <div className="flex justify-end">
-                    <button type="button" className="text-sm font-medium text-[#d63031] hover:text-red-400 transition-colors">
-                        Forgot password?
-                    </button>
+                  <button 
+  type="button" 
+  onClick={() => window.location.href = '/forgot-password'}
+  className="text-sm font-medium text-[#d63031] hover:text-red-400 transition-colors"
+>
+  Forgot password?
+</button>
                 </div>
 
                 <button
