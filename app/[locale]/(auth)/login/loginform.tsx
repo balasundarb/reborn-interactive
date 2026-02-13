@@ -13,15 +13,24 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await onSubmit?.(email, password);
-    } finally {
-      setIsLoading(false);
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    if (onSubmit) {
+      await onSubmit(email, password);
+    } else {
+      // Default Better Auth sign in
+      const { authClient } = await import('@/lib/auth-client');
+      await authClient.signIn.email({ email, password });
+      window.location.href = '/'; // Redirect after login
     }
-  };
+  } catch (error: any) {
+    alert(error.message || 'Login failed');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="w-full max-w-md p-10 bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">

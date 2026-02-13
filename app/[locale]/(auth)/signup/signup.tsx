@@ -22,16 +22,28 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
 
   const isPasswordValid = formData.password.length >= 8;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await onSignup?.(formData);
-    } finally {
-      setIsLoading(false);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    if (onSignup) {
+      await onSignup(formData);
+    } else {
+      // Default Better Auth sign up
+      const { authClient } = await import('@/lib/auth-client');
+      await authClient.signUp.email({
+        email: formData.email,
+        password: formData.password,
+        name: formData.fullName,
+      });
+      window.location.href = '/'; // Redirect after signup
     }
-  };
-
+  } catch (error: any) {
+    alert(error.message || 'Signup failed');
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <div className="w-full max-w-md p-10 bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
       {/* Header */}
