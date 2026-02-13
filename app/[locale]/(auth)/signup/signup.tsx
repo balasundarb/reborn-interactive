@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import { 
-  User, Mail, Lock, ShieldCheck, ArrowRight, 
-  Github, Chrome, Eye, EyeOff, Loader2 
+import {
+  User, Mail, Lock, ShieldCheck, ArrowRight,
+  Github, Chrome, Eye, EyeOff, Loader2
 } from 'lucide-react';
 
 interface SignupFormProps {
@@ -22,28 +22,28 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
 
   const isPasswordValid = formData.password.length >= 8;
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
-  try {
-    if (onSignup) {
-      await onSignup(formData);
-    } else {
-      // Default Better Auth sign up
-      const { authClient } = await import('@/lib/auth-client');
-      await authClient.signUp.email({
-        email: formData.email,
-        password: formData.password,
-        name: formData.fullName,
-      });
-      window.location.href = '/'; // Redirect after signup
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      if (onSignup) {
+        await onSignup(formData);
+      } else {
+        // Default Better Auth sign up
+        const { authClient } = await import('@/lib/auth-client');
+        await authClient.signUp.email({
+          email: formData.email,
+          password: formData.password,
+          name: formData.fullName,
+        });
+        window.location.href = '/'; // Redirect after signup
+      }
+    } catch (error: any) {
+      alert(error.message || 'Signup failed');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error: any) {
-    alert(error.message || 'Signup failed');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
   return (
     <div className="w-full max-w-md p-10 bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
       {/* Header */}
@@ -64,7 +64,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               placeholder="Full Name"
               className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-[#d63031]/40 focus:border-[#d63031]/40 transition-all"
               required
-              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
             />
           </div>
 
@@ -76,7 +76,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               placeholder="Email address"
               className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-[#d63031]/40 focus:border-[#d63031]/40 transition-all"
               required
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -88,7 +88,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               placeholder="Create Password"
               className="w-full pl-10 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-[#d63031]/40 focus:border-[#d63031]/40 transition-all"
               required
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
             <button
               type="button"
@@ -108,11 +108,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         {/* Terms Checkbox */}
         <label className="flex items-center space-x-3 cursor-pointer group">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             className="w-4 h-4 rounded border-white/10 bg-white/5 text-[#d63031] focus:ring-[#d63031]/50 focus:ring-offset-slate-900 transition-all"
             required
-            onChange={(e) => setFormData({...formData, agreeToTerms: e.target.checked})}
+            onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
           />
           <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors font-medium">
             I agree to the <a href="#" className="text-[#d63031] hover:underline">Terms</a>
@@ -147,23 +147,30 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       {/* Social Options */}
       <div className="flex gap-4">
-<button 
-  type="button"
-  onClick={async () => {
-    if (onSocialSignup) {
-      onSocialSignup('google');
-    } else {
-      const { authClient } = await import('@/lib/auth-client');
-      await authClient.signIn.social({ provider: 'google' });
-    }
-  }} 
-  className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
->
-  <Chrome size={20} className="group-hover:scale-110 transition-transform" />
-</button>
-        <button 
+        <button
           type="button"
-          onClick={() => onSocialSignup?.('github')} 
+          onClick={async () => {
+            if (onSocialSignup) {
+              onSocialSignup('google');
+            } else {
+              const { authClient } = await import('@/lib/auth-client');
+              await authClient.signIn.social({ provider: 'google' });
+            }
+          }}
+          className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
+        >
+          <Chrome size={20} className="group-hover:scale-110 transition-transform" />
+        </button>
+        <button
+          type="button"
+          onClick={async () => {
+            if (onSocialSignup) {
+              onSocialSignup('github');
+            } else {
+              const { authClient } = await import('@/lib/auth-client');
+              await authClient.signIn.social({ provider: 'github' });
+            }
+          }}
           className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
         >
           <Github size={20} className="group-hover:scale-110 transition-transform" />
@@ -172,7 +179,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       <p className="mt-8 text-center text-slate-400 text-sm">
         Already have an account?{" "}
-        <button className="text-white font-bold hover:text-[#d63031] transition-colors">
+        <button  onClick={() =>  window.location.href = '/login'} className="text-white font-bold hover:text-[#d63031] transition-colors">
           Log in
         </button>
       </p>
