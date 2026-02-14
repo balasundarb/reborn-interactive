@@ -8,42 +8,42 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || 'my_secret_key_change_me_in_production',
   database: mongodbAdapter(db),
-emailAndPassword: {
-  enabled: true,
-  autoSignIn: true,
-    resetPasswordEnabled: true, 
-sendResetPassword: async ({ user, url }) => {
-  try {
-    const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: user.email,
-      subject: 'Reset Your Password',
-      html: `<p>Click <a href="${url}">here</a> to reset your password</p>`,
-    });
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: true,
+    resetPasswordEnabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      try {
+        const { data, error } = await resend.emails.send({
+          from: 'onboarding@resend.dev',
+          to: user.email,
+          subject: 'Reset Your Password',
+          html: `<p>Click <a href="${url}">here</a> to reset your password</p>`,
+        });
 
-    if (error) {
-      console.error('❌ Resend error:', error);
-      throw error;
-    }
+        if (error) {
+          console.error('❌ Resend error:', error);
+          throw error;
+        }
 
-    console.log('✅ Email sent successfully:', data);
-  } catch (error) {
-    console.error('❌ Failed to send reset email:', error);
-    throw error;
-  }
-},
-},
+        console.log('✅ Email sent successfully:', data);
+      } catch (error) {
+        console.error('❌ Failed to send reset email:', error);
+        throw error;
+      }
+    },
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
-     github: {
-    clientId: process.env.GITHUB_CLIENT_ID as string,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    },
   },
-  },
-   
+
   session: {
     cookieCache: {
       enabled: true,

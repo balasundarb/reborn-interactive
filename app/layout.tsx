@@ -21,8 +21,12 @@ export const metadata: Metadata = {
     apple: "/favicon-180x180.png",
   },
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#ffffff",
 };
+
 
 export default function RootLayout({
   children,

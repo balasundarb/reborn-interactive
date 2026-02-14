@@ -179,7 +179,7 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
 
       <p className="mt-8 text-center text-slate-400 text-sm">
         Already have an account?{" "}
-        <button  onClick={() =>  window.location.href = '/login'} className="text-white font-bold hover:text-[#d63031] transition-colors">
+        <button onClick={() => window.location.href = '/login'} className="text-white font-bold hover:text-[#d63031] transition-colors">
           Log in
         </button>
       </p>

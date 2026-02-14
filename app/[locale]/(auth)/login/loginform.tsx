@@ -22,8 +22,18 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
             } else {
                 // Default Better Auth sign in
                 const { authClient } = await import('@/lib/auth-client');
-                await authClient.signIn.email({ email, password });
-                window.location.href = '/'; // Redirect after login
+                const res = await authClient.signIn.email({
+                    email,
+                    password,
+                });
+
+                if (res.error) {
+                    throw new Error(res.error.message || "Invalid credentials");
+                }
+
+                window.location.href = "/";
+
+
             }
         } catch (error: any) {
             alert(error.message || 'Login failed');
@@ -79,13 +89,13 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
                 </div>
 
                 <div className="flex justify-end">
-                  <button 
-  type="button" 
-  onClick={() => window.location.href = '/forgot-password'}
-  className="text-sm font-medium text-[#d63031] hover:text-red-400 transition-colors"
->
-  Forgot password?
-</button>
+                    <button
+                        type="button"
+                        onClick={() => window.location.href = '/forgot-password'}
+                        className="text-sm font-medium text-[#d63031] hover:text-red-400 transition-colors"
+                    >
+                        Forgot password?
+                    </button>
                 </div>
 
                 <button
@@ -138,12 +148,12 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
                     }}
                     icon={<Github size={20} />}
                 />
-          
+
             </div>
 
             <p className="mt-8 text-center text-slate-400 text-sm">
                 New here?{" "}
-                <button  onClick={() =>  window.location.href = '/signup'} className="text-white font-bold hover:text-[#d63031] transition-colors hover:underline">
+                <button onClick={() => window.location.href = '/signup'} className="text-white font-bold hover:text-[#d63031] transition-colors hover:underline">
                     Create an account
                 </button>
             </p>
