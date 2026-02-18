@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, Github, Chrome, Eye, EyeOff, Loader2 } from 'lucide-react';
-
+import { User, Lock, ArrowRight, Github, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { FaGoogle } from "react-icons/fa";
 interface LoginFormProps {
     onSubmit?: (email: string, password: string) => Promise<void> | void;
     onSocialLogin?: (provider: 'google' | 'facebook' | 'github' | 'apple' | 'twitter') => void;
@@ -135,7 +135,7 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
                             await authClient.signIn.social({ provider: 'google' });
                         }
                     }}
-                    icon={<Chrome size={20} />}
+                    icon={<FaGoogle size={20} />}
                 />
                 <SocialButton
                     onClick={async () => {
