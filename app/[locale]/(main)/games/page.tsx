@@ -94,37 +94,6 @@ export default function GamesPage() {
           ))}
         </motion.h1>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ 
-            delay: 0.8, 
-            duration: 0.5,
-          }}
-          viewport={{ once: true }}
-          className="flex items-center gap-3"
-        >
-          {[0, 0.15, 0.3].map((delay, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.4, 1, 0.4],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: delay
-              }}
-              className="w-2.5 h-2.5 rounded-full"
-              style={{
-                backgroundColor: i === 0 ? '#ff3b30' : i === 1 ? '#ff6b6b' : '#ff4757',
-                boxShadow: `0 0 10px ${i === 0 ? '#ff3b30' : i === 1 ? '#ff6b6b' : '#ff4757'}`
-              }}
-            />
-          ))}
-        </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: 15 }}
