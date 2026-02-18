@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { connectDB } from "./mongodb";
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { Resend } from 'resend';
+import { resetPasswordTemplate } from "./email-templates/reset-password";
 
 const db = await connectDB();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -14,21 +15,21 @@ export const auth = betterAuth({
     resetPasswordEnabled: true,
     sendResetPassword: async ({ user, url }) => {
       try {
-        const { data, error } = await resend.emails.send({
+     const { data, error } = await resend.emails.send({
           from: 'onboarding@resend.dev',
           to: user.email,
-          subject: 'Reset Your Password',
-          html: `<p>Click <a href="${url}">here</a> to reset your password</p>`,
+          subject: 'Reset Your Password - Reborn Interactive',
+          html: resetPasswordTemplate(url, user.name),
         });
 
         if (error) {
-          console.error('❌ Resend error:', error);
+          console.error(' Resend error:', error);
           throw error;
         }
 
-        console.log('✅ Email sent successfully:', data);
+        console.log('Email sent successfully:', data);
       } catch (error) {
-        console.error('❌ Failed to send reset email:', error);
+        console.error('Failed to send reset email:', error);
         throw error;
       }
     },

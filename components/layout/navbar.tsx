@@ -18,18 +18,18 @@ export function NavbarDemo() {
    const params = useParams();
    const locale = params.locale as string;
   const navItems = [
-    {
-      name: "News",
-      link: `/${locale}/news`,
-    },
+    // {
+    //   name: "News",
+    //   link: `/${locale}/news`,
+    // },
     {
       name: "Games",
       link: `/${locale}/games`,
     },
-    {
-      name: "Store",
-      link: `/${locale}/store`,
-    },
+    // {
+    //   name: "Store",
+    //   link: `/${locale}/store`,
+    // },
     {
       name: "Creators",
       link: `/${locale}/creators`,
@@ -50,7 +50,7 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-             <NavbarButton variant="secondary"><Languages /></NavbarButton>
+             {/* <NavbarButton variant="secondary"><Languages /></NavbarButton> */}
          
             <NavbarButton variant="primary" href="/login">Login</NavbarButton>
           </div>
