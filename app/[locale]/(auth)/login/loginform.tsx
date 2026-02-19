@@ -6,6 +6,11 @@ interface LoginFormProps {
     onSubmit?: (email: string, password: string) => Promise<void> | void;
     onSocialLogin?: (provider: 'google' | 'facebook' | 'github' | 'apple' | 'twitter') => void;
 }
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
 
 export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
     const [email, setEmail] = useState<string>('');
@@ -13,34 +18,61 @@ export function LoginForm({ onSubmit, onSocialLogin }: LoginFormProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            if (onSubmit) {
-                await onSubmit(email, password);
-            } else {
-                // Default Better Auth sign in
-                const { authClient } = await import('@/lib/auth-client');
-                const res = await authClient.signIn.email({
-                    email,
-                    password,
-                });
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-                if (res.error) {
-                    throw new Error(res.error.message || "Invalid credentials");
-                }
-
-                window.location.href = "/";
-
-
+    try {
+        // Wait for grecaptcha to be ready instead of checking window.grecaptcha directly
+        const token = await new Promise<string>((resolve, reject) => {
+            if (!window.grecaptcha) {
+                return reject(new Error("reCAPTCHA not loaded"));
             }
-        } catch (error: any) {
-            alert(error.message || 'Login failed');
-        } finally {
-            setIsLoading(false);
+            window.grecaptcha.ready(async () => {
+                try {
+                    const t = await window.grecaptcha.execute(
+                        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!,
+                        { action: "login" }
+                    );
+                    resolve(t);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+
+        const verifyRes = await fetch("/api/verify-recaptcha", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+
+        const verifyData = await verifyRes.json();
+
+        if (!verifyData.success) {
+            throw new Error("Bot verification failed");
         }
-    };
+
+        if (onSubmit) {
+            await onSubmit(email, password);
+        } else {
+            const { authClient } = await import('@/lib/auth-client');
+            const res = await authClient.signIn.email({ email, password });
+
+            if (res.error) {
+                throw new Error(res.error.message || "Invalid credentials");
+            }
+
+            window.location.href = "/";
+        }
+
+    } catch (error: any) {
+        alert(error.message || 'Login failed');
+    } finally {
+        setIsLoading(false);
+    }
+};
+
 
     return (
         <div className="w-full max-w-md p-10 bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
