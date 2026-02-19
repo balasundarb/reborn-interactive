@@ -6,7 +6,7 @@ const CARD_DATA = [
   {
     id: "1",
     image: "/team/ajay_rahul.webp",
-    title: "Managing Director",
+    title: "Ajay Rahul",
     description:
       "The Managing Director oversees strategy, finance, and operations of the game development company.",
     colorKey: "1",
@@ -15,7 +15,7 @@ const CARD_DATA = [
   {
     id: "2",
     image: "/team/balasundar.webp",
-    title: "Graphic Designer",
+    title: "Balasundar",
     description:
       "Creates visual assets for games, including UI elements, promotional materials, and in-game graphics.",
     colorKey: "2",
@@ -24,7 +24,7 @@ const CARD_DATA = [
   {
     id: "3",
     image: "/team/Shekinah.jpg",
-    title: "Full Stack Developer",
+    title: "Shekinah Florance M",
     description:
       "Builds and maintains backend services, APIs, databases, and game dashboards.",
     colorKey: "3",
@@ -33,7 +33,7 @@ const CARD_DATA = [
     {
     id: "4",
     image: "/team/jegan.webp",
-    title: "Full Stack Developer",
+    title: "Jegan",
     description:
       "Builds and maintains backend services, APIs, databases, and game dashboards.",
     colorKey: "1",
@@ -42,7 +42,7 @@ const CARD_DATA = [
      {
     id: "5",
     image: "/team/jegan.webp",
-    title: "Full Stack Developer",
+    title: "Vishnu",
     description:
       "Builds and maintains backend services, APIs, databases, and game dashboards.",
     colorKey: "2",
