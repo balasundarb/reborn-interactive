@@ -114,10 +114,8 @@ function RollingTextList() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col items-center justify-center px-4 py-12">
-      <h3 className="mb-8 text-sm font-bold uppercase tracking-widest text-neutral-500">
-        Process
-      </h3>
-      <div className="w-full flex flex-col">
+   
+      <div className="w-full mt-30 flex flex-col">
         {items.map((item) => (
           <RollingTextItem key={item.id} item={item} />
         ))}

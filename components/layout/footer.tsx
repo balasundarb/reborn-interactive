@@ -166,7 +166,7 @@ const Footer: React.FC = () => {
                 <div className="pt-10 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-6 animate-[fadeInUp_0.6s_ease-out_0.4s_both]">
                     <div className="flex flex-col items-center md:items-start gap-1">
                         <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">
-                            &copy; {currentYear} Re-born Interactive
+                            &copy; Re-born Interactive Co., Ltd. {currentYear}  All rights reserved.
                         </p>
                         <p className="text-[10px] text-gray-600 flex items-center gap-1">
                             Crafted with{' '}

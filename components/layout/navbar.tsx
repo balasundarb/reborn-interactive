@@ -14,9 +14,9 @@ export function MyNavbar() {
   const navItems = useMemo(
     () => [
       { name: "Home", link: `/${locale}` },
-      { name: "About", link: `/${locale}/games` },
+      { name: "About", link: `/${locale}/about` },
       { name: "Creators", link: `/${locale}/creators` },
-      { name: "News", link: `/${locale}/careers` },
+      { name: "News", link: `/${locale}/news` },
     ],
     [locale]
   );

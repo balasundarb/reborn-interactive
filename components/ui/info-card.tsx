@@ -209,16 +209,18 @@ export const InfoCard: React.FC<InfoCardProps> = ({
           </h1>
           <p
             style={{
-              fontSize: 14,
+              fontSize: 16,
+              fontWeight: 800,
               lineHeight: 1.6,
-              color: textColor,
+              color: hovered ? "black" : textColor,
               opacity: 0.8,
               display: "-webkit-box",
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               direction: isRTL(description) ? "rtl" : "ltr",
-              transition: "opacity 0.3s ease",
+            
+                transition: "color 0.3s ease",
               textAlign:"justify"
             }}
           >
