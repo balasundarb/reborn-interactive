@@ -1,151 +1,78 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { InfoCard } from "@/components/ui/info-card";
 
+const ACCENT_RED = "#d63031";
+
 const CARD_DATA = [
-  {
-    id: "1",
-    image: "/team/ajay_rahul.webp",
-    title: "Ajay Rahul",
-    description:
-      "The Managing Director oversees strategy, finance, and operations of the game development company.",
-    colorKey: "1",
-    hoverColor: "#242424",
-  },
-  {
-    id: "2",
-    image: "/team/balasundar.webp",
-    title: "Balasundar",
-    description:
-      "Creates visual assets for games, including UI elements, promotional materials, and in-game graphics.",
-    colorKey: "2",
-    hoverColor: "#fff",
-  },
-  {
-    id: "3",
-    image: "/team/Shekinah.jpg",
-    title: "Shekinah Florance M",
-    description:
-      "Builds and maintains backend services, APIs, databases, and game dashboards.",
-    colorKey: "3",
-    hoverColor: "#2196F3",
-  },
-    {
-    id: "4",
-    image: "/team/jegan.webp",
-    title: "Jegan",
-    description:
-      "Builds and maintains backend services, APIs, databases, and game dashboards.",
-    colorKey: "1",
-    hoverColor: "#2196F3",
-  },
-     {
-    id: "5",
-    image: "/team/jegan.webp",
-    title: "Vishnu",
-    description:
-      "Builds and maintains backend services, APIs, databases, and game dashboards.",
-    colorKey: "2",
-    hoverColor: "#2196F3",
-  },
+  { id: "1", image: "/assets/team/ajay_rahul.webp", title: "Ajay Rahul", description: "The Managing Director oversees strategy, finance, and operations of the game development company." },
+  { id: "2", image: "/assets/team/balasundar.webp", title: "Balasundar", description: "Creates visual assets for games, including UI elements and promotional materials." },
+  { id: "3", image: "/assets/team/Shekinah.jpg", title: "Shekinah Florance M", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
+  { id: "4", image: "/assets/team/jegan.webp", title: "Jegan", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
+  { id: "5", image: "/assets/team/vishnu.webp", title: "Vishnu", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
 ];
 
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    setMatches(media.matches);
-    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
-    media.addEventListener("change", listener);
-    return () => media.removeEventListener("change", listener);
-  }, [query]);
-
-  return matches;
-}
-
 export const Demo: React.FC = () => {
-  const isMobile = useMediaQuery("(max-width: 767px)");
-  const isTablet = useMediaQuery("(max-width: 1024px)");
-
   return (
-    <div
-      style={{
-        ...gridContainerStyle,
-        gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-        padding: isMobile ? "2rem 1.25rem" : isTablet ? "3rem 5%" : "4rem 10%",
-        gap: isMobile ? "1.5rem" : "2rem",
-      }}
-    >
-      {CARD_DATA.map((card, index) => {
-        const isRightAligned = !isMobile && index % 2 !== 0;
-
-        return (
-          <div
-            key={card.id}
-            style={{
-              ...itemWrapperStyle,
-              gridColumnStart: isRightAligned ? 2 : 1,
-              marginTop: isRightAligned ? "100px" : "0px",
-            }}
+    <section className="w-full bg-[#0a0a0a] py-12 px-6 sm:px-10 lg:px-20 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Title Section */}
+        <header className="mb-16 md:mb-24 text-center">
+          <div 
+            className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-[0.2em] uppercase rounded-full border border-[#d63031]/30 text-[#d63031] bg-[#d63031]/5"
           >
-            <div
-              style={
-                {
-                  ...cardWrapperStyle,
-                  maxWidth: isMobile ? "100%" : "388px",
-                  ["--hover-text-color" as string]: card.hoverColor,
-                } as React.CSSProperties
-              }
-            >
-              <InfoCard
-                image={card.image}
-                title={card.title}
-                description={card.description}
-                borderColor={`var(--border-color-${card.colorKey})`}
-                effectBgColor={`var(--border-color-${card.colorKey})`}
-                hoverTextColor={`var(--hover-text-color-${card.colorKey})`}
-                borderBgColor="var(--border-bg-color)"
-                cardBgColor="var(--card-bg-color)"
-                textColor="var(--text-color)"
-                fontFamily="var(--font-family)"
-                rtlFontFamily="var(--rtl-font-family)"
-                patternColor1="var(--pattern-color1)"
-                patternColor2="var(--pattern-color2)"
-                contentPadding="1.5rem"
-              />
-            </div>
+            The Team
           </div>
-        );
-      })}
-    </div>
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight italic uppercase">
+            Creators<span style={{ color: ACCENT_RED }}>.</span>
+          </h1>
+          <p className="mt-4 text-gray-400 max-w-md mx-auto text-sm md:text-base">
+            The architects of digital worlds and seamless experiences.
+          </p>
+        </header>
+
+        {/* Responsive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-12 md:gap-y-0 items-start">
+          {CARD_DATA.map((card, index) => {
+            // Apply stagger effect only on screens wider than 'md' (768px)
+            const isRightColumn = index % 2 !== 0;
+
+            return (
+              <div
+                key={card.id}
+                className={`w-full group relative transition-all duration-500
+                  ${isRightColumn ? "md:mt-32" : "md:mt-0"}
+                `}
+              >
+                {/* Glow Background Effect */}
+                <div 
+                  className="absolute -inset-1 rounded-2xl opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-20 pointer-events-none"
+                  style={{ backgroundColor: ACCENT_RED }}
+                />
+
+                {/* Card Wrapper */}
+                <div className="relative bg-[#111111] rounded-2xl overflow-hidden border border-white/5 transition-colors duration-500">
+                  <InfoCard
+                    image={card.image}
+                    title={card.title}
+                    description={card.description}
+                    borderColor={ACCENT_RED}
+                    effectBgColor={ACCENT_RED}
+                    hoverTextColor="#ffffff"
+                    borderBgColor="transparent"
+                    cardBgColor="transparent"
+                    textColor="#cccccc"
+                    contentPadding="1.5rem"
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
-};
-
-// --- Styles ---
-
-const gridContainerStyle: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(2, 1fr)",
-  gap: "2rem",
-  padding: "4rem 10%",
-  maxWidth: "1200px",
-  margin: "0 auto",
-  alignItems: "start",
-};
-
-const itemWrapperStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "center",
-  width: "100%",
-};
-
-const cardWrapperStyle: React.CSSProperties = {
-  width: "100%",
-  maxWidth: "388px",
-  minHeight: "380px",
-  position: "relative",
-  transition: "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
 };
 
 export default Demo;
