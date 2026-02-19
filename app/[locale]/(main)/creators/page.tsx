@@ -4,7 +4,7 @@ import { InfoCard } from "@/components/ui/info-card";
 
 const CARD_DATA = [
   {
-    id: "american",
+    id: "1",
     image: "/team/ajay_rahul.webp",
     title: "Managing Director",
     description:
@@ -13,7 +13,7 @@ const CARD_DATA = [
     hoverColor: "#242424",
   },
   {
-    id: "british",
+    id: "2",
     image: "/team/balasundar.webp",
     title: "Graphic Designer",
     description:
@@ -22,12 +22,30 @@ const CARD_DATA = [
     hoverColor: "#fff",
   },
   {
-    id: "hebrew",
+    id: "3",
     image: "/team/Shekinah.jpg",
     title: "Full Stack Developer",
     description:
       "Builds and maintains backend services, APIs, databases, and game dashboards.",
     colorKey: "3",
+    hoverColor: "#2196F3",
+  },
+    {
+    id: "4",
+    image: "/team/jegan.webp",
+    title: "Full Stack Developer",
+    description:
+      "Builds and maintains backend services, APIs, databases, and game dashboards.",
+    colorKey: "1",
+    hoverColor: "#2196F3",
+  },
+     {
+    id: "5",
+    image: "/team/jegan.webp",
+    title: "Full Stack Developer",
+    description:
+      "Builds and maintains backend services, APIs, databases, and game dashboards.",
+    colorKey: "2",
     hoverColor: "#2196F3",
   },
 ];

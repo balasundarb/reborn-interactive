@@ -10,26 +10,19 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { Languages } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { GetInTouch } from "@/components/landingpage/GetinTouch";
 
-export function NavbarDemo() {
-   const params = useParams();
-   const locale = params.locale as string;
+export function MyNavbar() {
+  const params = useParams();
+  const locale = params.locale as string;
+
   const navItems = [
-    // {
-    //   name: "News",
-    //   link: `/${locale}/news`,
-    // },
     {
       name: "Games",
       link: `/${locale}/games`,
     },
-    // {
-    //   name: "Store",
-    //   link: `/${locale}/store`,
-    // },
     {
       name: "Creators",
       link: `/${locale}/creators`,
@@ -41,6 +34,7 @@ export function NavbarDemo() {
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isGetInTouchOpen, setIsGetInTouchOpen] = useState(false);
 
   return (
     <div className="relative w-full">
@@ -50,9 +44,12 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-             {/* <NavbarButton variant="secondary"><Languages /></NavbarButton> */}
-         
-            <NavbarButton variant="primary" href="/login">Login</NavbarButton>
+            <NavbarButton
+              variant="primary"
+              onClick={() => setIsGetInTouchOpen(true)}
+            >
+              Get in touch
+            </NavbarButton>
           </div>
         </NavBody>
 
@@ -82,28 +79,25 @@ export function NavbarDemo() {
             ))}
             <div className="flex w-full flex-col gap-4">
               <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsGetInTouchOpen(true);
+                }}
                 variant="primary"
                 className="w-full"
               >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Book a call
+                Get in touch
               </NavbarButton>
             </div>
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
-    
 
-      {/* Navbar */}
+      {/* Get In Touch Drawer */}
+      <GetInTouch
+        isOpen={isGetInTouchOpen}
+        onClose={() => setIsGetInTouchOpen(false)}
+      />
     </div>
   );
 }
-
-
