@@ -3,7 +3,7 @@
 
 import Careers from "@/components/landingpage/Careers";
 import HeroSection from "@/components/landingpage/HeroSection";
-import Image from "next/image";
+
 
 const HomePage = () => {
 

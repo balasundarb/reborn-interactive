@@ -18,7 +18,7 @@ const Careers: React.FC = () => {
           heading="Elevate Your Future" 
           desc="Join a team of innovators and dreamers. We don't just build products; we build legacies. Explore our open roles today."
           img="/assets/career_home.png"
-          link="/careers"
+          link="/news"
           imageLeft={true}
         />
         
@@ -27,7 +27,7 @@ const Careers: React.FC = () => {
           heading="Our Culture" 
           desc="Rooted in excellence and driven by purpose. Discover the values that guide every decision we make in our journey."
           img="/assets/career_home1.png"
-          link="/company"
+          link="/about"
           imageLeft={false}
         />
       </div>
