@@ -177,7 +177,7 @@ function Ticker({ value }: { value: number }) {
           animate={{ y: 0 }}
           exit={{ y: "-100%" }}
           transition={{ duration: 0.28, ease: EASE_EXPO }}
-          className="block text-xs font-mono text-white/25 tabular-nums"
+          className="block text-xs font-mono text-white/65 tabular-nums"
         >
           {String(value + 1).padStart(2, "0")}
         </motion.span>
@@ -396,7 +396,7 @@ export const NavMenus = ({ isOpen, onClose, navItems = [] }: NavMenusProps) => {
 
                         {/* Label */}
                         <div className="relative flex-1 overflow-hidden">
-                          <span className="relative block text-5xl md:text-[4.5rem] font-black uppercase tracking-tighter leading-none">
+                          <span className="relative block text-white text-5xl md:text-[4.5rem] font-black uppercase tracking-tighter leading-none">
                             <DualSplitText text={item.name} hovered={hoveredIndex === i} />
                           </span>
                           {item.description && (

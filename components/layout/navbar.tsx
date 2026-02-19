@@ -3,8 +3,9 @@
 import { useParams } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import { GetInTouch } from "@/components/landingpage/GetinTouch"; 
+import { GetInTouch } from "@/components/landingpage/GetinTouch";
 import { NavMenus } from "../ui/NavMenus";
+import Link from "next/link";
 
 export function MyNavbar() {
   const { locale } = useParams() as { locale: string };
@@ -36,7 +37,7 @@ export function MyNavbar() {
     <>
       <nav className="absolute top-0 left-0 z-50 flex w-full items-center justify-between px-8 py-6">
         {/* Logo - Kept Original Colors */}
-        <div className="relative">
+        <Link href='/' className="relative">
           <Image
             src="/assets/navbar/Website.png"
             alt="Logo"
@@ -45,7 +46,7 @@ export function MyNavbar() {
             priority
             className="w-20 sm:w-24 md:w-32 h-auto"
           />
-        </div>
+        </Link>
 
         {/* Right side Actions */}
         <div className="flex items-center gap-6">
@@ -56,7 +57,7 @@ export function MyNavbar() {
           >
             {/* Background Shape */}
             <div className="absolute inset-0 bg-white skew-x-[-15deg] border-r-4 border-red-600 group-hover:bg-red-600 transition-colors" />
-            
+
             <span className="relative text-black text-xs font-black uppercase tracking-widest group-hover:text-white transition-colors">
               Get in touch
             </span>
@@ -69,19 +70,16 @@ export function MyNavbar() {
             aria-label="Toggle menu"
           >
             {/* Top Bar */}
-            <span className={`h-0.5 bg-white transition-all duration-300 origin-right ${
-              isMenuOpen ? 'w-8 -rotate-45 translate-y-[1px]' : 'w-8'
-            }`} />
-            
+            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 -rotate-45 translate-y-[1px]' : 'w-8'
+              }`} />
+
             {/* Middle Bar */}
-            <span className={`h-0.5 bg-white transition-all duration-300 ${
-              isMenuOpen ? 'opacity-0 w-0' : 'w-5 group-hover:w-8'
-            }`} />
-            
+            <span className={`h-0.5 bg-red-600 transition-all duration-300 ${isMenuOpen ? 'opacity-0 w-0' : 'w-5 group-hover:w-8'
+              }`} />
+
             {/* Bottom Bar */}
-            <span className={`h-0.5 bg-white transition-all duration-300 origin-right ${
-              isMenuOpen ? 'w-8 rotate-45 -translate-y-[1px]' : 'w-8'
-            }`} />
+            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 rotate-45 -translate-y-[1px]' : 'w-8'
+              }`} />
           </button>
         </div>
       </nav>

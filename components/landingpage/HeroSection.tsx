@@ -19,9 +19,9 @@ function bakeGlowSprite(radius: number): HTMLCanvasElement {
   const cx = size / 2;
   // Soft halo
   const halo = c.createRadialGradient(cx, cx, 0, cx, cx, size / 2);
-  halo.addColorStop(0,   "rgba(214,48,49,0.55)");
-  halo.addColorStop(0.45,"rgba(214,48,49,0.15)");
-  halo.addColorStop(1,   "rgba(214,48,49,0)");
+  halo.addColorStop(0, "rgba(214,48,49,0.55)");
+  halo.addColorStop(0.45, "rgba(214,48,49,0.15)");
+  halo.addColorStop(1, "rgba(214,48,49,0)");
   c.fillStyle = halo;
   c.fillRect(0, 0, size, size);
   // Bright core
@@ -45,22 +45,22 @@ function debounce<T extends (...a: unknown[]) => void>(fn: T, ms: number): T {
 const easeOutExpo = (p: number) => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
 
 const HeroSection: React.FC = () => {
-  const videoRef         = useRef<HTMLVideoElement>(null);
-  const canvasRef        = useRef<HTMLCanvasElement>(null);
-  const chargeBarRef     = useRef<HTMLDivElement>(null);   // CSS-var charge, no setState
-  const parallaxHudRef   = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chargeBarRef = useRef<HTMLDivElement>(null);   // CSS-var charge, no setState
+  const parallaxHudRef = useRef<HTMLDivElement>(null);
   const parallaxTitleRef = useRef<HTMLDivElement>(null);
 
   const loadedFiredRef = useRef(false);                    // guard double-fire
   const [loaded, setLoaded] = useState(false);
-  const [time, setTime]     = useState("00:00:00");
+  const [time, setTime] = useState("00:00:00");
 
   // ── Clock (1s interval, negligible cost) ──────────────────────────────────
   useEffect(() => {
     const tick = setInterval(() => {
       const n = new Date();
       setTime([n.getHours(), n.getMinutes(), n.getSeconds()]
-        .map(v => String(v).padStart(2,"0")).join(":"));
+        .map(v => String(v).padStart(2, "0")).join(":"));
     }, 1000);
     return () => clearInterval(tick);
   }, []);
@@ -100,11 +100,11 @@ const HeroSection: React.FC = () => {
   // ── Mouse parallax — single rAF loop, GPU-only transforms ────────────────
   useEffect(() => {
     const mouse = { x: 0, y: 0 };
-    const cur   = { hx: 0, hy: 0, tx: 0, ty: 0 };
+    const cur = { hx: 0, hy: 0, tx: 0, ty: 0 };
     let raf: number;
 
     const onMove = (e: MouseEvent) => {
-      mouse.x = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
     // passive: true — never blocks scroll
@@ -173,7 +173,7 @@ const HeroSection: React.FC = () => {
         p.y += p.vy;
         p.alpha += p.alphaDir * 0.0022;
         if (p.alpha > 0.52) { p.alpha = 0.52; p.alphaDir = -1; }
-        if (p.alpha < 0.04) { p.alpha = 0.04; p.alphaDir =  1; }
+        if (p.alpha < 0.04) { p.alpha = 0.04; p.alphaDir = 1; }
         if (p.y < -24) { p.y = H + 12; p.x = Math.random() * W; }
 
         // Stamp pre-baked sprite — zero GPU stall, no per-call shadowBlur
@@ -339,15 +339,15 @@ const HeroSection: React.FC = () => {
       <video
         ref={videoRef}
         aria-hidden="true"
-        src="/assets/hero/intro.webm"
-        poster="/assets/hero/intro-poster.jpg"
+        src="video/Intro.webm"
+        poster="/assets/hero/intro.png"
         autoPlay loop muted playsInline preload="auto"
         onCanPlay={handleVideoReady}
         onLoadedData={handleVideoReady}
         className="absolute inset-0 w-full h-full object-cover gpu"
         style={{ zIndex: "var(--z-bg)" as any }}
       >
-        <source src="/assets/hero/intro.mp4" type="video/mp4" />
+        <source src="video/Intro.webm" type="video/webm" />
       </video>
 
       {/* ─────────────────────────────────────────────
@@ -391,7 +391,7 @@ const HeroSection: React.FC = () => {
         zIndex: "var(--z-ovl)" as any,
       }} />
 
- 
+
 
       {/* ─────────────────────────────────────────────
           HUD CORNERS  (single parallax group, GPU layer)
@@ -404,32 +404,32 @@ const HeroSection: React.FC = () => {
       >
         {/* ── TOP-LEFT ── */}
         <div className="absolute top-0 left-0"
-          style={{ opacity: loaded?1:0, transition:"opacity .5s ease .3s" }}>
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .3s" }}>
           <svg width="180" height="140" viewBox="0 0 180 140" fill="none">
             <path d="M0 70 L0 8 Q0 0 8 0 L90 0" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded?"hud-draw 1s ease-out .4s both":"none" }}/>
-            <path d="M0 70 L0 8" stroke="#d63031" strokeWidth="3" strokeOpacity=".18"/>
-            <line x1="0" y1="84" x2="38" y2="84" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28"/>
-            <line x1="0" y1="96" x2="22" y2="96" stroke="#d63031" strokeWidth=".5" strokeOpacity=".15"/>
-            <rect x="2" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9"/>
-            <circle cx="90" cy="0" r="2" fill="#d63031" fillOpacity=".5"/>
+              style={{ animation: loaded ? "hud-draw 1s ease-out .4s both" : "none" }} />
+            <path d="M0 70 L0 8" stroke="#d63031" strokeWidth="3" strokeOpacity=".18" />
+            <line x1="0" y1="84" x2="38" y2="84" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
+            <line x1="0" y1="96" x2="22" y2="96" stroke="#d63031" strokeWidth=".5" strokeOpacity=".15" />
+            <rect x="2" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9" />
+            <circle cx="90" cy="0" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
-   
+
           <div className="absolute top-8 left-2 text-[8px] text-white/25 tracking-wider glow-w">{time}</div>
           <div className="absolute top-[50px] left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
         </div>
 
         {/* ── TOP-RIGHT ── */}
         <div className="absolute top-0 right-0"
-          style={{ opacity: loaded?1:0, transition:"opacity .5s ease .4s" }}>
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .4s" }}>
           <svg width="160" height="120" viewBox="0 0 160 120" fill="none">
             <path d="M160 60 L160 8 Q160 0 152 0 L80 0" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded?"hud-draw 1s ease-out .5s both":"none" }}/>
-            <rect x="152" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9"/>
-            <line x1="160" y1="70" x2="130" y2="70" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28"/>
-            <circle cx="80" cy="0" r="2" fill="#d63031" fillOpacity=".5"/>
+              style={{ animation: loaded ? "hud-draw 1s ease-out .5s both" : "none" }} />
+            <rect x="152" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9" />
+            <line x1="160" y1="70" x2="130" y2="70" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
+            <circle cx="80" cy="0" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
           <div className="absolute top-[10px] right-10 text-[9px] text-[#d63031]/58 tracking-widest uppercase glow-r text-right">
             REBORN INTERACTIVE
@@ -437,9 +437,9 @@ const HeroSection: React.FC = () => {
           <div className="absolute top-8 right-4 flex items-center gap-1.5">
             {/* CSS-only pulse ring — no JS */}
             <div className="relative w-2 h-2">
-              <div className="absolute inset-0 rounded-full border border-[#d63031] anim-pulse-ring"/>
+              <div className="absolute inset-0 rounded-full border border-[#d63031] anim-pulse-ring" />
               <div className="absolute inset-[2px] rounded-full bg-[#d63031]"
-                style={{boxShadow:"0 0 5px #d63031"}}/>
+                style={{ boxShadow: "0 0 5px #d63031" }} />
             </div>
             <span className="text-[8px] text-white/25 tracking-wider">LIVE</span>
           </div>
@@ -447,27 +447,27 @@ const HeroSection: React.FC = () => {
 
         {/* ── BOTTOM-LEFT ── */}
         <div className="absolute bottom-0 left-0"
-          style={{ opacity: loaded?1:0, transition:"opacity .5s ease .5s" }}>
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .5s" }}>
           <svg width="160" height="100" viewBox="0 0 160 100" fill="none">
             <path d="M0 40 L0 92 Q0 100 8 100 L80 100" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded?"hud-draw 1s ease-out .6s both":"none" }}/>
-            <rect x="2" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9"/>
-            <line x1="0" y1="30" x2="28" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28"/>
-            <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5"/>
+              style={{ animation: loaded ? "hud-draw 1s ease-out .6s both" : "none" }} />
+            <rect x="2" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9" />
+            <line x1="0" y1="30" x2="28" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
+            <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
         </div>
 
         {/* ── BOTTOM-RIGHT — coordinates ── */}
         <div className="absolute bottom-0 right-0"
-          style={{ opacity: loaded?1:0, transition:"opacity .5s ease .55s" }}>
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .55s" }}>
           <svg width="160" height="100" viewBox="0 0 160 100" fill="none">
             <path d="M160 40 L160 92 Q160 100 152 100 L80 100" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded?"hud-draw 1s ease-out .65s both":"none" }}/>
-            <rect x="152" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9"/>
-            <line x1="160" y1="30" x2="132" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28"/>
-            <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5"/>
+              style={{ animation: loaded ? "hud-draw 1s ease-out .65s both" : "none" }} />
+            <rect x="152" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9" />
+            <line x1="160" y1="30" x2="132" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
+            <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
           <div className="absolute bottom-10 right-3 text-right">
             <div className="text-[7px] text-[#d63031]/40 tracking-widest uppercase mb-0.5">COORDS</div>
@@ -483,13 +483,13 @@ const HeroSection: React.FC = () => {
       <div aria-hidden="true"
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={{ zIndex: "var(--z-ui)" as any }}>
-        <div style={{ opacity: loaded?.1:0, transition:"opacity 1.2s ease 1s" }}>
+        <div style={{ opacity: loaded ? .1 : 0, transition: "opacity 1.2s ease 1s" }}>
           <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
-            <line x1="27" y1="0"  x2="27" y2="21" stroke="#d63031" strokeWidth=".8"/>
-            <line x1="27" y1="33" x2="27" y2="54" stroke="#d63031" strokeWidth=".8"/>
-            <line x1="0"  y1="27" x2="21" y2="27" stroke="#d63031" strokeWidth=".8"/>
-            <line x1="33" y1="27" x2="54" y2="27" stroke="#d63031" strokeWidth=".8"/>
-            <rect x="24" y="24" width="6" height="6" stroke="#d63031" strokeWidth=".8" fill="none"/>
+            <line x1="27" y1="0" x2="27" y2="21" stroke="#d63031" strokeWidth=".8" />
+            <line x1="27" y1="33" x2="27" y2="54" stroke="#d63031" strokeWidth=".8" />
+            <line x1="0" y1="27" x2="21" y2="27" stroke="#d63031" strokeWidth=".8" />
+            <line x1="33" y1="27" x2="54" y2="27" stroke="#d63031" strokeWidth=".8" />
+            <rect x="24" y="24" width="6" height="6" stroke="#d63031" strokeWidth=".8" fill="none" />
           </svg>
         </div>
       </div>
@@ -513,23 +513,23 @@ const HeroSection: React.FC = () => {
         >
           {/* Top ornamental rule */}
           <div className="flex items-center gap-3 mb-3" style={{ opacity: .7 }}>
-            <div className="h-px w-12 bg-[#d63031]" style={{ boxShadow:"0 0 6px #d63031" }}/>
+            <div className="h-px w-12 bg-[#d63031]" style={{ boxShadow: "0 0 6px #d63031" }} />
             <svg width="24" height="14" viewBox="0 0 24 14" fill="none">
-              <path d="M12 1 C8 1 4 4 4 7 C4 10 8 13 12 13 C16 13 20 10 20 7 C20 4 16 1 12 1 Z" stroke="#d63031" strokeWidth=".8" fill="none"/>
-              <path d="M1 7 L4 7 M20 7 L23 7" stroke="#d63031" strokeWidth=".8"/>
-              <circle cx="12" cy="7" r="1.5" fill="#d63031" fillOpacity=".8"/>
+              <path d="M12 1 C8 1 4 4 4 7 C4 10 8 13 12 13 C16 13 20 10 20 7 C20 4 16 1 12 1 Z" stroke="#d63031" strokeWidth=".8" fill="none" />
+              <path d="M1 7 L4 7 M20 7 L23 7" stroke="#d63031" strokeWidth=".8" />
+              <circle cx="12" cy="7" r="1.5" fill="#d63031" fillOpacity=".8" />
             </svg>
-            <div className="h-px w-12 bg-[#d63031]" style={{ boxShadow:"0 0 6px #d63031" }}/>
+            <div className="h-px w-12 bg-[#d63031]" style={{ boxShadow: "0 0 6px #d63031" }} />
           </div>
 
           {/* Corner-bracketed container */}
           <div className="relative px-6 py-2">
             {/* Corner brackets */}
-            {[["top-0 left-0","M0 10 L0 0 L10 0"],["top-0 right-0","M0 0 L10 0 L10 10"],
-              ["bottom-0 left-0","M0 0 L0 10 L10 10"],["bottom-0 right-0","M10 0 L10 10 L0 10"]
+            {[["top-0 left-0", "M0 10 L0 0 L10 0"], ["top-0 right-0", "M0 0 L10 0 L10 10"],
+            ["bottom-0 left-0", "M0 0 L0 10 L10 10"], ["bottom-0 right-0", "M10 0 L10 10 L0 10"]
             ].map(([pos, d], i) => (
               <svg key={i} className={`absolute ${pos}`} width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d={d} stroke="#d63031" strokeWidth="1.2" strokeOpacity=".75"/>
+                <path d={d} stroke="#d63031" strokeWidth="1.2" strokeOpacity=".75" />
               </svg>
             ))}
 
@@ -553,13 +553,13 @@ const HeroSection: React.FC = () => {
 
           {/* Bottom ornamental rule */}
           <div className="flex items-center gap-3 mt-3" style={{ opacity: .7 }}>
-            <div className="h-px w-8 bg-[#d63031]" style={{ boxShadow:"0 0 6px #d63031" }}/>
+            <div className="h-px w-8 bg-[#d63031]" style={{ boxShadow: "0 0 6px #d63031" }} />
             <svg width="32" height="10" viewBox="0 0 32 10" fill="none">
-              <path d="M1 5 L5 2 L9 5 L5 8 Z" stroke="#d63031" strokeWidth=".7" fill="none"/>
-              <line x1="9" y1="5" x2="23" y2="5" stroke="#d63031" strokeWidth=".7" strokeDasharray="2 2"/>
-              <path d="M23 5 L27 2 L31 5 L27 8 Z" stroke="#d63031" strokeWidth=".7" fill="none"/>
+              <path d="M1 5 L5 2 L9 5 L5 8 Z" stroke="#d63031" strokeWidth=".7" fill="none" />
+              <line x1="9" y1="5" x2="23" y2="5" stroke="#d63031" strokeWidth=".7" strokeDasharray="2 2" />
+              <path d="M23 5 L27 2 L31 5 L27 8 Z" stroke="#d63031" strokeWidth=".7" fill="none" />
             </svg>
-            <div className="h-px w-8 bg-[#d63031]" style={{ boxShadow:"0 0 6px #d63031" }}/>
+            <div className="h-px w-8 bg-[#d63031]" style={{ boxShadow: "0 0 6px #d63031" }} />
           </div>
         </div>
 
@@ -570,12 +570,12 @@ const HeroSection: React.FC = () => {
             transition: loaded ? "opacity 1.2s cubic-bezier(.4,0,.2,1)" : "none",
           }}>
           <div className="h-px bg-[#d63031]" style={{
-            width: loaded?"clamp(26px,3.5vw,50px)":"0px",
+            width: loaded ? "clamp(26px,3.5vw,50px)" : "0px",
             transition: "width .9s cubic-bezier(.16,1,.3,1) 1.5s",
             boxShadow: "0 0 7px #d63031",
-          }}/>
+          }} />
           <span className="text-[10px] tracking-[.34em] text-white/30 uppercase"
-            style={{ fontFamily:"'Share Tech Mono', monospace" }}>
+            style={{ fontFamily: "'Share Tech Mono', monospace" }}>
             PLAYER ONE<span className="anim-blink text-[#d63031]/72 ml-1">_</span>
           </span>
         </div>
@@ -586,9 +586,9 @@ const HeroSection: React.FC = () => {
       <div aria-hidden="true"
         className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none"
         style={{
-          width:700, height:210,
-          background:"radial-gradient(ellipse,rgba(214,48,49,.12) 0%,transparent 68%)",
-          zIndex:6,
+          width: 700, height: 210,
+          background: "radial-gradient(ellipse,rgba(214,48,49,.12) 0%,transparent 68%)",
+          zIndex: 6,
         }}
       />
     </section>
