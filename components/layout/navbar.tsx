@@ -1,103 +1,102 @@
 "use client";
-import {
-  Navbar,
-  NavBody,
-  NavItems,
-  MobileNav,
-  NavbarLogo,
-  NavbarButton,
-  MobileNavHeader,
-  MobileNavToggle,
-  MobileNavMenu,
-} from "@/components/ui/resizable-navbar";
+
 import { useParams } from "next/navigation";
-import { useState } from "react";
-import { GetInTouch } from "@/components/landingpage/GetinTouch";
+import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
+import { GetInTouch } from "@/components/landingpage/GetinTouch"; 
+import { NavMenus } from "../ui/NavMenus";
 
 export function MyNavbar() {
-  const params = useParams();
-  const locale = params.locale as string;
-
-  const navItems = [
-    {
-      name: "Games",
-      link: `/${locale}/games`,
-    },
-    {
-      name: "Creators",
-      link: `/${locale}/creators`,
-    },
-    {
-      name: "Careers",
-      link: `/${locale}/careers`,
-    },
-  ];
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { locale } = useParams() as { locale: string };
   const [isGetInTouchOpen, setIsGetInTouchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = useMemo(
+    () => [
+      { name: "Home", link: `/${locale}` },
+      { name: "About", link: `/${locale}/games` },
+      { name: "Creators", link: `/${locale}/creators` },
+      { name: "News", link: `/${locale}/careers` },
+    ],
+    [locale]
+  );
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMenuOpen) closeMenu();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isMenuOpen]);
 
   return (
-    <div className="relative w-full">
-      <Navbar>
-        {/* Desktop Navigation */}
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={navItems} />
-          <div className="flex items-center gap-4">
-            <NavbarButton
-              variant="primary"
-              onClick={() => setIsGetInTouchOpen(true)}
-            >
-              Get in touch
-            </NavbarButton>
-          </div>
-        </NavBody>
+    <>
+      <nav className="absolute top-0 left-0 z-50 flex w-full items-center justify-between px-8 py-6">
+        {/* Logo - Kept Original Colors */}
+        <div className="relative">
+          <Image
+            src="/assets/navbar/Website.png"
+            alt="Logo"
+            width={600}
+            height={200}
+            priority
+            className="w-20 sm:w-24 md:w-32 h-auto"
+          />
+        </div>
 
-        {/* Mobile Navigation */}
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            />
-          </MobileNavHeader>
-
-          <MobileNavMenu
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
+        {/* Right side Actions */}
+        <div className="flex items-center gap-6">
+          {/* CTA Button: Sharp Gaming Edge */}
+          <button
+            onClick={() => setIsGetInTouchOpen(true)}
+            className="hidden sm:block relative group px-6 py-2 transition-transform active:scale-95"
           >
-            {navItems.map((item, idx) => (
-              <a
-                key={`mobile-link-${idx}`}
-                href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
-              >
-                <span className="block">{item.name}</span>
-              </a>
-            ))}
-            <div className="flex w-full flex-col gap-4">
-              <NavbarButton
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setIsGetInTouchOpen(true);
-                }}
-                variant="primary"
-                className="w-full"
-              >
-                Get in touch
-              </NavbarButton>
-            </div>
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
+            {/* Background Shape */}
+            <div className="absolute inset-0 bg-white skew-x-[-15deg] border-r-4 border-red-600 group-hover:bg-red-600 transition-colors" />
+            
+            <span className="relative text-black text-xs font-black uppercase tracking-widest group-hover:text-white transition-colors">
+              Get in touch
+            </span>
+          </button>
 
-      {/* Get In Touch Drawer */}
+          {/* Hamburger Menu: Clean Industrial Toggle */}
+          <button
+            onClick={toggleMenu}
+            className="group flex flex-col gap-1.5 items-end justify-center p-2 focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {/* Top Bar */}
+            <span className={`h-0.5 bg-white transition-all duration-300 origin-right ${
+              isMenuOpen ? 'w-8 -rotate-45 translate-y-[1px]' : 'w-8'
+            }`} />
+            
+            {/* Middle Bar */}
+            <span className={`h-0.5 bg-white transition-all duration-300 ${
+              isMenuOpen ? 'opacity-0 w-0' : 'w-5 group-hover:w-8'
+            }`} />
+            
+            {/* Bottom Bar */}
+            <span className={`h-0.5 bg-white transition-all duration-300 origin-right ${
+              isMenuOpen ? 'w-8 rotate-45 -translate-y-[1px]' : 'w-8'
+            }`} />
+          </button>
+        </div>
+      </nav>
+
+      {/* NavMenus overlay */}
+      <NavMenus
+        isOpen={isMenuOpen}
+        onClose={closeMenu}
+        navItems={navItems}
+      />
+
       <GetInTouch
         isOpen={isGetInTouchOpen}
         onClose={() => setIsGetInTouchOpen(false)}
       />
-    </div>
+    </>
   );
 }

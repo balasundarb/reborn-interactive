@@ -339,15 +339,15 @@ const HeroSection: React.FC = () => {
       <video
         ref={videoRef}
         aria-hidden="true"
-        src="/hero/intro.webm"
-        poster="/hero/intro-poster.jpg"
+        src="/assets/hero/intro.webm"
+        poster="/assets/hero/intro-poster.jpg"
         autoPlay loop muted playsInline preload="auto"
         onCanPlay={handleVideoReady}
         onLoadedData={handleVideoReady}
         className="absolute inset-0 w-full h-full object-cover gpu"
         style={{ zIndex: "var(--z-bg)" as any }}
       >
-        <source src="/hero/intro.mp4" type="video/mp4" />
+        <source src="/assets/hero/intro.mp4" type="video/mp4" />
       </video>
 
       {/* ─────────────────────────────────────────────
@@ -391,17 +391,7 @@ const HeroSection: React.FC = () => {
         zIndex: "var(--z-ovl)" as any,
       }} />
 
-      {/* ─────────────────────────────────────────────
-          LEFT CHARGE BAR  (CSS-var, no React renders)
-      ───────────────────────────────────────────── */}
-      <div
-        ref={chargeBarRef}
-        aria-hidden="true"
-        className="absolute left-0 top-0 bottom-0 w-[2px] pointer-events-none"
-        style={{ zIndex: "var(--z-hud)" as any, background: "rgba(214,48,49,.06)" }}
-      >
-        <div className="charge-fill absolute bottom-0 left-0 w-full" />
-      </div>
+ 
 
       {/* ─────────────────────────────────────────────
           HUD CORNERS  (single parallax group, GPU layer)
@@ -425,13 +415,7 @@ const HeroSection: React.FC = () => {
             <rect x="2" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9"/>
             <circle cx="90" cy="0" r="2" fill="#d63031" fillOpacity=".5"/>
           </svg>
-          {/* Signal bars */}
-          <div className="absolute top-[10px] left-10 flex items-end gap-[3px]">
-            {[3,5,7,9,11].map((h,i)=>(
-              <div key={i} className={`sig w-[3px] ${i<4?"on":"off"}`} style={{height:h}}/>
-            ))}
-            <span className="ml-[5px] text-[8px] tracking-widest uppercase glow-r text-[#d63031]/60">SIG</span>
-          </div>
+   
           <div className="absolute top-8 left-2 text-[8px] text-white/25 tracking-wider glow-w">{time}</div>
           <div className="absolute top-[50px] left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
         </div>
@@ -448,7 +432,7 @@ const HeroSection: React.FC = () => {
             <circle cx="80" cy="0" r="2" fill="#d63031" fillOpacity=".5"/>
           </svg>
           <div className="absolute top-[10px] right-10 text-[9px] text-[#d63031]/58 tracking-widest uppercase glow-r text-right">
-            REBORN.EXE
+            REBORN INTERACTIVE
           </div>
           <div className="absolute top-8 right-4 flex items-center gap-1.5">
             {/* CSS-only pulse ring — no JS */}
@@ -597,37 +581,6 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────
-          TICKER BAR
-      ───────────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-0 left-0 right-0 pointer-events-none gpu-fade"
-        style={{
-          zIndex: "var(--z-tick)" as any,
-          opacity: loaded?1:0,
-          transition:"opacity .8s ease 1.2s",
-        }}
-      >
-        <div className="overflow-hidden border-t border-[#d63031]/10 bg-[#020202]/80 py-1.5">
-          <div className="anim-ticker flex whitespace-nowrap" style={{width:"200%"}}>
-            {[0,1].map(i=>(
-              <div key={i} className="flex items-center gap-8 px-4" style={{width:"50%"}}>
-                {["SYSTEM INITIALIZED","PLAYER ONE READY","SERVER CONNECTED",
-                  "REBORN INTERACTIVE","THREAT LEVEL: EXTREME","MISSION: ACTIVE",
-                  "COORDINATES: 31.24° N / 121.46° E","REBORN ENGINE v2.0.1",
-                  "ENCRYPTED CHANNEL OPEN"].map((item,j)=>(
-                  <span key={j} className="flex items-center gap-2 shrink-0">
-                    <span className="w-1 h-1 bg-[#d63031]/35 rounded-full shrink-0"/>
-                    <span className="text-[8px] text-white/18 tracking-widest uppercase"
-                      style={{fontFamily:"'Share Tech Mono', monospace"}}>{item}</span>
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* ── Bottom red ambient glow — static CSS, zero JS ── */}
       <div aria-hidden="true"
