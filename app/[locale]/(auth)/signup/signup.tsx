@@ -5,6 +5,7 @@ import {
   Github, Eye, EyeOff, Loader2
 } from 'lucide-react';
 import { FaGoogle } from "react-icons/fa";
+import { authClient } from '@/lib/auth-client';
 interface SignupFormProps {
   onSignup?: (data: any) => Promise<void> | void;
   onSocialSignup?: (provider: string) => void;
@@ -30,13 +31,20 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
         await onSignup(formData);
       } else {
         // Default Better Auth sign up
-        const { authClient } = await import('@/lib/auth-client');
-        await authClient.signUp.email({
+        const {data,error }= await authClient.signUp.email({
           email: formData.email,
           password: formData.password,
           name: formData.fullName,
+          callbackURL: `${window.location.origin}/`
         });
-        window.location.href = '/'; // Redirect after signup
+
+        if(data){
+
+         window.location.href = '/'; // Redirect after signup
+        }
+          if(error){
+            throw new Error(error.message);
+          }
       }
     } catch (error: any) {
       alert(error.message || 'Signup failed');
