@@ -1,21 +1,41 @@
 "use client";
 import React, { useState } from 'react';
 import { Github, Twitter, Linkedin, Instagram, Heart, Send } from 'lucide-react';
+import { NextResponse } from 'next/server';
+import { toast } from 'sonner';
 
 const Footer: React.FC = () => {
-    const currentYear = new Date().getFullYear();
+
     const [email, setEmail] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setEmail('');
-        }, 1500);
-    };
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (!email.trim()) return;
+
+  try {
+    setIsSubmitting(true);
+
+    const res = await fetch("/api/newsletter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Subscription failed");
+    }
+
+    toast.success("Successfully joined the network.");
+    setEmail("");
+  } catch (err: any) {
+    toast.error(err.message || "Something went wrong.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
     const socialLinks: { icon: typeof Twitter; href: string; label: string }[] = [
         { icon: Twitter, href: '#', label: 'Twitter' },
@@ -149,12 +169,12 @@ const Footer: React.FC = () => {
                                                 </span>
                                                 <Send
                                                     size={14}
-                                                    className={`relative transition-transform duration-300 ${
-                                                        isSubmitting ? 'translate-x-1' : 'group-hover/btn:translate-x-1'
-                                                    }`}
+                                                    className={`relative transition-transform duration-300 ${isSubmitting ? 'translate-x-1' : 'group-hover/btn:translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
+                               
                                     </form>
                                 </div>
                             </div>
@@ -165,8 +185,8 @@ const Footer: React.FC = () => {
                 {/* Bottom Bar */}
                 <div className="pt-10 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-6 animate-[fadeInUp_0.6s_ease-out_0.4s_both]">
                     <div className="flex flex-col items-center md:items-start gap-1">
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">
-                            &copy; Re-born Interactive Co., Ltd. {currentYear}  All rights reserved.
+                        <p className="text-[10px] uppercase md:tracking-[0.5em] text-white/50 ">
+                            &copy;  Re-born Interactive Co., Ltd.{new Date().getFullYear()}. All Rights Reserved.
                         </p>
                         <p className="text-[10px] text-gray-600 flex items-center gap-1">
                             Crafted with{' '}

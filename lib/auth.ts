@@ -12,10 +12,11 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
+    requireEmailVerification: false,
     resetPasswordEnabled: true,
     sendResetPassword: async ({ user, url }) => {
       try {
-     const { data, error } = await resend.emails.send({
+        const { data, error } = await resend.emails.send({
           from: 'onboarding@resend.dev',
           to: user.email,
           subject: 'Reset Your Password - Reborn Interactive',
