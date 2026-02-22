@@ -11,6 +11,7 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@reduxjs/toolkit": "^2.11.2",
+    "@studio-freight/lenis": "^1.0.42",
     "@tabler/icons-react": "^3.36.1",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
@@ -27,7 +28,9 @@
     "react-google-recaptcha-v3": "^1.11.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
+    "recharts": "^3.7.0",
     "resend": "^6.9.2",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

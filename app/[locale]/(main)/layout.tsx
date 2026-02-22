@@ -2,6 +2,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import{ MyNavbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import ScrollToTop from '@/components/layout/scrollToTop';
 
 type Props = {
     children: React.ReactNode;
@@ -16,6 +17,7 @@ export default function MainLayout({ children }: Props) {
                     {children}
                 </main>
                 <Footer />
+                  <ScrollToTop />
             </div>
         </NextIntlClientProvider>
     );

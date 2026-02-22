@@ -1,0 +1,1388 @@
+[
+  {
+    "sessionId": "d82c2267-119c-4da3-9c09-25b21479ad65",
+    "ipAddress": "103.79.28.187",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Tamil Nadu",
+    "city": "Chennai",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-16T01:01:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-16T01:30:58.000Z"
+    }
+  },
+  {
+    "sessionId": "ec020604-1af0-447d-8011-a410898470b6",
+    "ipAddress": "103.75.116.173",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Maharashtra",
+    "city": "Mumbai",
+    "lat": 19.076,
+    "lon": 72.8777,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": "https://google.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-14T02:33:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-14T03:09:58.000Z"
+    }
+  },
+  {
+    "sessionId": "706e1b97-3ade-4927-af97-c192faf3828f",
+    "ipAddress": "103.76.46.113",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Karnataka",
+    "city": "Bangalore",
+    "lat": 12.9716,
+    "lon": 77.5946,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-15T22:18:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-15T22:57:58.000Z"
+    }
+  },
+  {
+    "sessionId": "dac35920-557a-425d-807e-769fd410b6ab",
+    "ipAddress": "103.199.230.37",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Delhi",
+    "city": "New Delhi",
+    "lat": 28.6139,
+    "lon": 77.209,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": "https://twitter.com",
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-15T00:57:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-15T01:22:58.000Z"
+    }
+  },
+  {
+    "sessionId": "9ad57209-7ab6-442f-bade-ed46e063db72",
+    "ipAddress": "103.77.206.49",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "West Bengal",
+    "city": "Kolkata",
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": "https://instagram.com",
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-14T01:22:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-14T01:47:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4410dda1-072d-44e2-a10f-313ef777abae",
+    "ipAddress": "103.228.243.96",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "California",
+    "city": "San Francisco",
+    "lat": 37.7749,
+    "lon": -122.4194,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://reddit.com",
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-14T00:08:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-14T00:29:58.000Z"
+    }
+  },
+  {
+    "sessionId": "554edf20-3b01-4c67-bf49-e6f1539ce29a",
+    "ipAddress": "103.213.65.46",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "New York",
+    "city": "New York",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://linkedin.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-17T00:32:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-17T00:39:58.000Z"
+    }
+  },
+  {
+    "sessionId": "243088a9-740d-4c52-9c2a-6674923cc384",
+    "ipAddress": "103.161.81.49",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "Texas",
+    "city": "Austin",
+    "lat": 30.2672,
+    "lon": -97.7431,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://youtube.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-13T21:58:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-13T22:35:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4188cab8-475e-477e-bd18-e1a86c53f5bb",
+    "ipAddress": "103.78.45.96",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "region": "England",
+    "city": "London",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://facebook.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-17T22:52:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-17T23:20:58.000Z"
+    }
+  },
+  {
+    "sessionId": "15ca0543-7ff0-4fa4-bf41-e92445f155f3",
+    "ipAddress": "103.36.180.220",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "Germany",
+    "countryCode": "DE",
+    "region": "Bavaria",
+    "city": "Munich",
+    "lat": 48.1351,
+    "lon": 11.582,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-19T03:05:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-19T03:41:58.000Z"
+    }
+  },
+  {
+    "sessionId": "a058cabf-3410-428b-ac5e-2b38583f88a6",
+    "ipAddress": "103.231.131.143",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "France",
+    "countryCode": "FR",
+    "region": "\u00cele-de-France",
+    "city": "Paris",
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": null,
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-16T00:05:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-16T00:43:58.000Z"
+    }
+  },
+  {
+    "sessionId": "5b632603-c79c-4782-85c1-eb6218691c3f",
+    "ipAddress": "103.192.36.192",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "Canada",
+    "countryCode": "CA",
+    "region": "Ontario",
+    "city": "Toronto",
+    "lat": 43.6532,
+    "lon": -79.3832,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-19T22:36:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-19T23:11:58.000Z"
+    }
+  },
+  {
+    "sessionId": "fe7368b3-b74a-4a20-971c-6e196c18d230",
+    "ipAddress": "103.19.154.147",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "Australia",
+    "countryCode": "AU",
+    "region": "New South Wales",
+    "city": "Sydney",
+    "lat": -33.8688,
+    "lon": 151.2093,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": "https://google.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-16T22:04:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-16T22:43:58.000Z"
+    }
+  },
+  {
+    "sessionId": "29a255a0-db70-4b58-a87c-9dae1a08604b",
+    "ipAddress": "103.239.141.3",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "Singapore",
+    "countryCode": "SG",
+    "region": "Central Singapore",
+    "city": "Singapore",
+    "lat": 1.3521,
+    "lon": 103.8198,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-15T23:57:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-16T00:33:58.000Z"
+    }
+  },
+  {
+    "sessionId": "0d2f38df-0a01-45f6-976a-fc2c4e0eb326",
+    "ipAddress": "103.252.113.124",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "Japan",
+    "countryCode": "JP",
+    "region": "Tokyo",
+    "city": "Tokyo",
+    "lat": 35.6762,
+    "lon": 139.6503,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://google.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-18T22:00:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-18T22:19:58.000Z"
+    }
+  },
+  {
+    "sessionId": "c3fc38dd-730a-4252-965e-0c6a27ea55b8",
+    "ipAddress": "103.124.140.141",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Brazil",
+    "countryCode": "BR",
+    "region": "S\u00e3o Paulo",
+    "city": "S\u00e3o Paulo",
+    "lat": -23.5505,
+    "lon": -46.6333,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://twitter.com",
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-16T01:14:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-16T01:27:58.000Z"
+    }
+  },
+  {
+    "sessionId": "b39b708f-15ec-4448-b711-6daea0d0b5ae",
+    "ipAddress": "103.196.144.169",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "region": "Lagos",
+    "city": "Lagos",
+    "lat": 6.5244,
+    "lon": 3.3792,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://instagram.com",
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-14T01:28:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-14T01:59:58.000Z"
+    }
+  },
+  {
+    "sessionId": "09372221-31a6-47ea-8f1b-8c17c71738ea",
+    "ipAddress": "103.68.86.83",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "Russia",
+    "countryCode": "RU",
+    "region": "Moscow",
+    "city": "Moscow",
+    "lat": 55.7558,
+    "lon": 37.6173,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://reddit.com",
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-17T22:06:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-17T22:39:58.000Z"
+    }
+  },
+  {
+    "sessionId": "ec314703-4329-40dd-9c91-3dc9d1957488",
+    "ipAddress": "103.33.49.74",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "Netherlands",
+    "countryCode": "NL",
+    "region": "North Holland",
+    "city": "Amsterdam",
+    "lat": 52.3676,
+    "lon": 4.9041,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": "https://linkedin.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-18T23:15:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-18T23:28:58.000Z"
+    }
+  },
+  {
+    "sessionId": "a66a2d44-e8ec-4ecf-8153-a93b99c0e010",
+    "ipAddress": "103.207.230.119",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "South Korea",
+    "countryCode": "KR",
+    "region": "Seoul",
+    "city": "Seoul",
+    "lat": 37.5665,
+    "lon": 126.978,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": "https://youtube.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-14T01:37:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-14T01:47:58.000Z"
+    }
+  },
+  {
+    "sessionId": "d08ed9d3-1aea-4cc5-b496-2cc0406fb78e",
+    "ipAddress": "103.226.13.30",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Tamil Nadu",
+    "city": "Chennai",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": "https://facebook.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-19T02:29:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-19T03:04:58.000Z"
+    }
+  },
+  {
+    "sessionId": "e5db1dbc-96d0-463e-b901-cd5df7a72fb2",
+    "ipAddress": "103.63.91.233",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Maharashtra",
+    "city": "Mumbai",
+    "lat": 19.076,
+    "lon": 72.8777,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": null,
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-19T22:31:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-19T22:56:58.000Z"
+    }
+  },
+  {
+    "sessionId": "21b9d5db-e704-49d7-b595-95d593670884",
+    "ipAddress": "103.131.62.151",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Karnataka",
+    "city": "Bangalore",
+    "lat": 12.9716,
+    "lon": 77.5946,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-18T22:48:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-18T23:21:58.000Z"
+    }
+  },
+  {
+    "sessionId": "42198ead-db29-4b49-9388-ef9d5d83a892",
+    "ipAddress": "103.87.207.115",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Delhi",
+    "city": "New Delhi",
+    "lat": 28.6139,
+    "lon": 77.209,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": null,
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-19T03:13:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-19T03:32:58.000Z"
+    }
+  },
+  {
+    "sessionId": "af738021-3d44-45f7-9b96-8b6134a22330",
+    "ipAddress": "103.227.171.112",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "West Bengal",
+    "city": "Kolkata",
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://google.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-15T03:14:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-15T03:19:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4b54a4c7-d9af-4242-a4d4-1c4c98f3b748",
+    "ipAddress": "103.153.150.84",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "California",
+    "city": "San Francisco",
+    "lat": 37.7749,
+    "lon": -122.4194,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://google.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-01-30T03:30:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-30T03:37:58.000Z"
+    }
+  },
+  {
+    "sessionId": "80d63253-df65-401b-b969-fbc33ddc5794",
+    "ipAddress": "103.123.152.171",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "New York",
+    "city": "New York",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://google.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-01-23T03:07:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-23T03:25:58.000Z"
+    }
+  },
+  {
+    "sessionId": "570d6ef0-6437-4402-8698-346eb2ab2856",
+    "ipAddress": "103.175.142.9",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "Texas",
+    "city": "Austin",
+    "lat": 30.2672,
+    "lon": -97.7431,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": "https://twitter.com",
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-01-25T00:32:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-25T00:56:58.000Z"
+    }
+  },
+  {
+    "sessionId": "374be879-d82e-48a8-b9e6-289166ff2d6c",
+    "ipAddress": "103.134.27.28",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "region": "England",
+    "city": "London",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": "https://instagram.com",
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-07T00:49:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-07T00:56:58.000Z"
+    }
+  },
+  {
+    "sessionId": "b7ccd66c-64c5-4c90-a227-4f68e28a8d5b",
+    "ipAddress": "103.129.2.26",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "Germany",
+    "countryCode": "DE",
+    "region": "Bavaria",
+    "city": "Munich",
+    "lat": 48.1351,
+    "lon": 11.582,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": "https://reddit.com",
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-01-31T01:03:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-31T01:24:58.000Z"
+    }
+  },
+  {
+    "sessionId": "063b751d-649f-4970-a658-84a9cfbf1a27",
+    "ipAddress": "103.81.63.20",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "France",
+    "countryCode": "FR",
+    "region": "\u00cele-de-France",
+    "city": "Paris",
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": "https://linkedin.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-01-26T02:51:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-26T03:16:58.000Z"
+    }
+  },
+  {
+    "sessionId": "b4026c19-d760-4edd-a517-47c9ecbf9c6c",
+    "ipAddress": "103.189.144.10",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "Canada",
+    "countryCode": "CA",
+    "region": "Ontario",
+    "city": "Toronto",
+    "lat": 43.6532,
+    "lon": -79.3832,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": "https://youtube.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-13T01:35:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-13T02:00:58.000Z"
+    }
+  },
+  {
+    "sessionId": "356362f6-9171-4809-948c-68c211f13b5c",
+    "ipAddress": "103.125.186.49",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "Australia",
+    "countryCode": "AU",
+    "region": "New South Wales",
+    "city": "Sydney",
+    "lat": -33.8688,
+    "lon": 151.2093,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://facebook.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-11T00:02:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-11T00:27:58.000Z"
+    }
+  },
+  {
+    "sessionId": "6596e99d-d1f0-4095-8a38-69dce3b0a43f",
+    "ipAddress": "103.84.54.27",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Singapore",
+    "countryCode": "SG",
+    "region": "Central Singapore",
+    "city": "Singapore",
+    "lat": 1.3521,
+    "lon": 103.8198,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": null,
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-10T02:43:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-10T03:01:58.000Z"
+    }
+  },
+  {
+    "sessionId": "82220640-40a2-46e8-93da-8523320e38dd",
+    "ipAddress": "103.124.152.212",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Japan",
+    "countryCode": "JP",
+    "region": "Tokyo",
+    "city": "Tokyo",
+    "lat": 35.6762,
+    "lon": 139.6503,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": null,
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-05T00:59:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-05T01:22:58.000Z"
+    }
+  },
+  {
+    "sessionId": "f9b02248-4688-4112-b464-31bef0afd478",
+    "ipAddress": "103.153.207.25",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "Brazil",
+    "countryCode": "BR",
+    "region": "S\u00e3o Paulo",
+    "city": "S\u00e3o Paulo",
+    "lat": -23.5505,
+    "lon": -46.6333,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": null,
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-03T22:50:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-03T23:29:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4e908507-df66-482d-a837-8046f4d09fe9",
+    "ipAddress": "103.212.209.186",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "region": "Lagos",
+    "city": "Lagos",
+    "lat": 6.5244,
+    "lon": 3.3792,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-07T23:41:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-07T23:58:58.000Z"
+    }
+  },
+  {
+    "sessionId": "d023dcb8-6bbd-42a3-b4ce-cc49dab70415",
+    "ipAddress": "103.93.63.216",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "Russia",
+    "countryCode": "RU",
+    "region": "Moscow",
+    "city": "Moscow",
+    "lat": 55.7558,
+    "lon": 37.6173,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": "https://google.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-03T03:12:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-03T03:38:58.000Z"
+    }
+  },
+  {
+    "sessionId": "2b4451f3-6eba-48f2-a94e-d485fea6e5da",
+    "ipAddress": "103.114.74.154",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "Netherlands",
+    "countryCode": "NL",
+    "region": "North Holland",
+    "city": "Amsterdam",
+    "lat": 52.3676,
+    "lon": 4.9041,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-07T00:36:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-07T01:10:58.000Z"
+    }
+  },
+  {
+    "sessionId": "46991817-5f0e-4992-95ec-729f1891462b",
+    "ipAddress": "103.2.36.92",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "South Korea",
+    "countryCode": "KR",
+    "region": "Seoul",
+    "city": "Seoul",
+    "lat": 37.5665,
+    "lon": 126.978,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": "https://twitter.com",
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-02T00:16:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-02T00:21:58.000Z"
+    }
+  },
+  {
+    "sessionId": "e1970c7c-861c-4531-9e5f-0ddf130e8af5",
+    "ipAddress": "103.111.19.175",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Tamil Nadu",
+    "city": "Chennai",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": "https://instagram.com",
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-01-24T01:30:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-24T02:05:58.000Z"
+    }
+  },
+  {
+    "sessionId": "79b41850-bbf7-4740-8ca2-607513610f12",
+    "ipAddress": "103.6.1.198",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Maharashtra",
+    "city": "Mumbai",
+    "lat": 19.076,
+    "lon": 72.8777,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://reddit.com",
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-01-30T02:10:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-30T02:45:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4d11a084-7a60-430e-8694-a55d23a5cf00",
+    "ipAddress": "103.45.224.218",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Karnataka",
+    "city": "Bangalore",
+    "lat": 12.9716,
+    "lon": 77.5946,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://linkedin.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-01-23T01:47:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-23T02:24:58.000Z"
+    }
+  },
+  {
+    "sessionId": "c0d78d0d-3d12-423d-9ca3-d51febcc94f0",
+    "ipAddress": "103.173.97.218",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Delhi",
+    "city": "New Delhi",
+    "lat": 28.6139,
+    "lon": 77.209,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://youtube.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-06T23:04:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-06T23:35:58.000Z"
+    }
+  },
+  {
+    "sessionId": "a50f2e48-0410-4642-b5f0-d35b4f8236ec",
+    "ipAddress": "103.248.222.195",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "West Bengal",
+    "city": "Kolkata",
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://facebook.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-02T23:46:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-02T23:53:58.000Z"
+    }
+  },
+  {
+    "sessionId": "4ff91f09-5c92-4a5a-b2ae-2fa42ca1246b",
+    "ipAddress": "103.92.143.28",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "California",
+    "city": "San Francisco",
+    "lat": 37.7749,
+    "lon": -122.4194,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-02-05T01:16:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-05T01:26:58.000Z"
+    }
+  },
+  {
+    "sessionId": "7ef406ef-1388-4707-9d0d-a7c4b0680a9d",
+    "ipAddress": "103.4.175.176",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "New York",
+    "city": "New York",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": null,
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-01-22T23:39:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-22T23:49:58.000Z"
+    }
+  },
+  {
+    "sessionId": "fc1f97a8-3e19-4936-b1b2-38f11899d8bc",
+    "ipAddress": "103.166.9.101",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "United States",
+    "countryCode": "US",
+    "region": "Texas",
+    "city": "Austin",
+    "lat": 30.2672,
+    "lon": -97.7431,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-06T23:17:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-06T23:42:58.000Z"
+    }
+  },
+  {
+    "sessionId": "a5f2239f-e7aa-4d97-a4e0-d97056c92c7c",
+    "ipAddress": "103.217.74.132",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "region": "England",
+    "city": "London",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": "https://google.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-06T22:38:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-06T23:04:58.000Z"
+    }
+  },
+  {
+    "sessionId": "e7f15aa2-9658-4a62-bd58-51b447741454",
+    "ipAddress": "103.220.201.116",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "Germany",
+    "countryCode": "DE",
+    "region": "Bavaria",
+    "city": "Munich",
+    "lat": 48.1351,
+    "lon": 11.582,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": "https://google.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-02-03T03:44:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-03T04:24:58.000Z"
+    }
+  },
+  {
+    "sessionId": "8db38c08-bf3a-40d0-a0bf-2b5ef27da2e3",
+    "ipAddress": "103.104.74.246",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "France",
+    "countryCode": "FR",
+    "region": "\u00cele-de-France",
+    "city": "Paris",
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://google.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-11T02:34:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-11T03:09:58.000Z"
+    }
+  },
+  {
+    "sessionId": "f4710f6d-80c7-40d3-8f71-75a051e624e7",
+    "ipAddress": "103.70.175.218",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Canada",
+    "countryCode": "CA",
+    "region": "Ontario",
+    "city": "Toronto",
+    "lat": 43.6532,
+    "lon": -79.3832,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://twitter.com",
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-01-22T01:43:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-22T01:56:58.000Z"
+    }
+  },
+  {
+    "sessionId": "1563c9f1-03bb-4b65-a119-734402b4244b",
+    "ipAddress": "103.145.101.127",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/121.0.0.0 Mobile Safari/537.36",
+    "country": "Australia",
+    "countryCode": "AU",
+    "region": "New South Wales",
+    "city": "Sydney",
+    "lat": -33.8688,
+    "lon": 151.2093,
+    "device": "Mobile",
+    "browser": "Chrome",
+    "os": "Android",
+    "referrer": "https://instagram.com",
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-01-28T00:06:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-28T00:24:58.000Z"
+    }
+  },
+  {
+    "sessionId": "30597cd7-9ed5-43b5-b139-24d992347c3e",
+    "ipAddress": "103.36.76.169",
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "Singapore",
+    "countryCode": "SG",
+    "region": "Central Singapore",
+    "city": "Singapore",
+    "lat": 1.3521,
+    "lon": 103.8198,
+    "device": "Tablet",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": "https://reddit.com",
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-01-28T00:41:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-28T01:11:58.000Z"
+    }
+  },
+  {
+    "sessionId": "65cb6d14-2119-4c9c-a2a5-63315884036b",
+    "ipAddress": "103.36.135.168",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "Japan",
+    "countryCode": "JP",
+    "region": "Tokyo",
+    "city": "Tokyo",
+    "lat": 35.6762,
+    "lon": 139.6503,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": "https://linkedin.com",
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-04T22:52:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-04T23:27:58.000Z"
+    }
+  },
+  {
+    "sessionId": "8b37aaf0-a5f9-4179-be6a-836637326b71",
+    "ipAddress": "103.195.238.212",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "Brazil",
+    "countryCode": "BR",
+    "region": "S\u00e3o Paulo",
+    "city": "S\u00e3o Paulo",
+    "lat": -23.5505,
+    "lon": -46.6333,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": "https://youtube.com",
+    "pathname": "/games",
+    "createdAt": {
+      "$date": "2026-01-25T02:40:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-25T03:11:58.000Z"
+    }
+  },
+  {
+    "sessionId": "3d8c45a6-ca0c-44f0-823d-5f2dfd85e017",
+    "ipAddress": "103.88.78.163",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "region": "Lagos",
+    "city": "Lagos",
+    "lat": 6.5244,
+    "lon": 3.3792,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": "https://facebook.com",
+    "pathname": "/store",
+    "createdAt": {
+      "$date": "2026-02-02T00:29:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-02T00:44:58.000Z"
+    }
+  },
+  {
+    "sessionId": "897b33b3-4922-48a3-9adc-bbc140d9ec24",
+    "ipAddress": "103.214.230.116",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15",
+    "country": "Russia",
+    "countryCode": "RU",
+    "region": "Moscow",
+    "city": "Moscow",
+    "lat": 55.7558,
+    "lon": 37.6173,
+    "device": "Desktop",
+    "browser": "Safari",
+    "os": "macOS",
+    "referrer": null,
+    "pathname": "/about",
+    "createdAt": {
+      "$date": "2026-01-25T22:10:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-01-25T22:47:58.000Z"
+    }
+  },
+  {
+    "sessionId": "8bd19cfc-cd0e-4d98-a3fa-096b1d6146a6",
+    "ipAddress": "103.120.20.125",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+    "country": "Netherlands",
+    "countryCode": "NL",
+    "region": "North Holland",
+    "city": "Amsterdam",
+    "lat": 52.3676,
+    "lon": 4.9041,
+    "device": "Desktop",
+    "browser": "Edge",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/news",
+    "createdAt": {
+      "$date": "2026-02-06T23:59:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-07T00:25:58.000Z"
+    }
+  },
+  {
+    "sessionId": "6027523a-b3cc-4a65-a24f-8cf4438f15f8",
+    "ipAddress": "103.178.65.232",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1",
+    "country": "South Korea",
+    "countryCode": "KR",
+    "region": "Seoul",
+    "city": "Seoul",
+    "lat": 37.5665,
+    "lon": 126.978,
+    "device": "Mobile",
+    "browser": "Safari",
+    "os": "iOS",
+    "referrer": null,
+    "pathname": "/creators",
+    "createdAt": {
+      "$date": "2026-02-02T01:02:58.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-02T01:17:58.000Z"
+    }
+  },
+  {
+    "sessionId": "f9144cc9-6a80-4a2c-ac3e-c8c2a8d60417",
+    "ipAddress": "49.71.231.155",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Tamil Nadu",
+    "city": "Chennai",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-21T03:46:47.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-21T03:46:47.000Z"
+    }
+  },
+  {
+    "sessionId": "bff86938-89b5-461a-9c8a-a50cf55e7ad5",
+    "ipAddress": "49.222.66.220",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Maharashtra",
+    "city": "Mumbai",
+    "lat": 19.076,
+    "lon": 72.8777,
+    "device": "Desktop",
+    "browser": "Chrome",
+    "os": "macOS",
+    "referrer": null,
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-21T03:46:36.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-21T03:46:36.000Z"
+    }
+  },
+  {
+    "sessionId": "28633c71-8d26-499d-b336-ca6d0a616e6b",
+    "ipAddress": "49.141.240.172",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    "country": "India",
+    "countryCode": "IN",
+    "region": "Karnataka",
+    "city": "Bangalore",
+    "lat": 12.9716,
+    "lon": 77.5946,
+    "device": "Desktop",
+    "browser": "Firefox",
+    "os": "Windows 10/11",
+    "referrer": null,
+    "pathname": "/",
+    "createdAt": {
+      "$date": "2026-02-21T03:46:36.000Z"
+    },
+    "lastActive": {
+      "$date": "2026-02-21T03:46:36.000Z"
+    }
+  }
+]
