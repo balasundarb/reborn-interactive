@@ -5,19 +5,21 @@ import { headers } from "next/headers";
 
 interface AdminPanelLayoutProps {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
 
 export default async function AdminPanelLayout({
   children,
   params,
 }: AdminPanelLayoutProps) {
+  const { locale } = await params;
+
   const session = await auth.api.getSession({
-    headers: await headers(), // better-auth needs the request headers
+    headers: await headers(),
   });
 
   if (!session?.user) {
-    redirect(`/${params.locale}/login`);
+    redirect(`/${locale}/login`);
   }
 
   return <>{children}</>;
