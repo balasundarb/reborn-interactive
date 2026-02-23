@@ -14,12 +14,12 @@ const CARD_DATA = [
 
 export const Demo: React.FC = () => {
   return (
-    <section className="w-full bg-[#0a0a0a] py-12 px-6 sm:px-10 lg:px-20 min-h-screen">
+    <section className="w-full bg-[#0a0a0a] py-20 px-6 sm:px-10 lg:px-20 min-h-screen selection:bg-[#d63031] selection:text-white">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Title Section */}
-        <header className="mb-16 md:mb-24 text-center">
-          <div 
+        <header className="mb-16 md:mb-32 text-center">
+          <div
             className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-[0.2em] uppercase rounded-full border border-[#d63031]/30 text-[#d63031] bg-[#d63031]/5"
           >
             The Team
@@ -33,26 +33,33 @@ export const Demo: React.FC = () => {
         </header>
 
         {/* Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-12 md:gap-y-0 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-x-16 items-start">
           {CARD_DATA.map((card, index) => {
-            // Apply stagger effect only on screens wider than 'md' (768px)
             const isRightColumn = index % 2 !== 0;
 
             return (
               <div
                 key={card.id}
-                className={`w-full group relative transition-all duration-500
-                  ${isRightColumn ? "md:mt-32" : "md:mt-0"}
+                /* 1. Added 'z-index' handling so hovered cards stay on top.
+                   2. Added 'overflow-visible' so the InfoCard pop-out isn't cut off by the grid cell.
+                */
+                className={`w-full group relative transition-all duration-500 hover:z-50
+                  ${isRightColumn ? "md:mt-40" : "md:mt-0"}
                 `}
               >
                 {/* Glow Background Effect */}
-                <div 
-                  className="absolute -inset-1 rounded-2xl opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-20 pointer-events-none"
+                <div
+                  className="absolute -inset-4 rounded-3xl opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-20 pointer-events-none"
                   style={{ backgroundColor: ACCENT_RED }}
                 />
 
                 {/* Card Wrapper */}
-                <div className="relative bg-[#111111] rounded-2xl border border-white/5 transition-colors duration-500">
+                <div className="relative rounded-2xl transition-colors duration-500 overflow-visible">
+
+                  {/* Background Layer */}
+                  <div className="absolute inset-0 bg-[#111111] rounded-2xl border border-white/5 pointer-events-none" />
+
+                  {/* InfoCard */}
                   <InfoCard
                     image={card.image}
                     title={card.title}
@@ -61,7 +68,7 @@ export const Demo: React.FC = () => {
                     effectBgColor={ACCENT_RED}
                     hoverTextColor="#ffffff"
                     borderBgColor="transparent"
-                    cardBgColor="transparent"
+                    cardBgColor="#111111"
                     textColor="#cccccc"
                     contentPadding="1.5rem"
                   />

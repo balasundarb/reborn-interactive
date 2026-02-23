@@ -11,7 +11,7 @@ interface ParallaxSectionProps {
 
 const Careers: React.FC = () => {
   return (
-    <section className="bg-neutral-950 py-16 lg:py-24 overflow-hidden">
+    <section className="bg-transparent py-16 lg:py-24 overflow-hidden">
       <div className="max-w-425 mx-auto flex flex-col gap-20 lg:gap-32 px-4">
         
         <ParallaxSection
@@ -64,7 +64,7 @@ const ParallaxSection: React.FC<ParallaxSectionProps> = ({
       className="w-full"
     >
       {/* Container - flex changes based on imageLeft prop */}
-      <div className={`relative flex flex-col ${imageLeft ? "lg:flex-row" : "lg:flex-row-reverse"} items-stretch w-full min-h-125 lg:h-175 rounded-[3rem] overflow-hidden bg-neutral-900 shadow-2xl border border-white/5`}>
+      <div className={`relative flex flex-col ${imageLeft ? "lg:flex-row" : "lg:flex-row-reverse"} items-stretch w-full min-h-125 lg:h-175 rounded-[3rem] `}>
 
         {/* IMAGE SIDE (55% Width) */}
         <div className="px-50 relative w-full lg:w-[55%] h-87.5 lg:h-auto overflow-hidden">

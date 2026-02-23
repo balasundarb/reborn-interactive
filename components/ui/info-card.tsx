@@ -34,11 +34,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   description,
   width = 388,
   height = 478,
-  borderColor = "#d63031", // Updated to your requested color
+  borderColor = "#d63031",
   borderBgColor = "#242424",
-  borderWidth = 3,
+  borderWidth = 5,
   borderPadding = 14,
-  cardBgColor = "#000",
+  cardBgColor = "transparent",
   shadowColor = "rgba(214, 48, 49, 0.2)",
   patternColor1 = "rgba(230,230,230,0.08)",
   patternColor2 = "rgba(240,240,240,0.08)",
@@ -57,14 +57,10 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     const border = borderRef.current;
     if (!border) return;
     const rect = border.getBoundingClientRect();
-    
-    // Calculate rotation for the border
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
     const angle = Math.atan2(y, x);
     border.style.setProperty("--rotation", `${angle}rad`);
-
-    // Calculate percentage for the radial glow
     const px = ((e.clientX - rect.left) / rect.width) * 100;
     const py = ((e.clientY - rect.top) / rect.height) * 100;
     setMousePos({ x: px, y: py });
@@ -72,7 +68,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
 
   const rtl = isRTL(title) || isRTL(description);
   const effectiveFont = rtl ? rtlFontFamily : fontFamily;
-  
+
   const pattern =
     `linear-gradient(45deg, ${patternColor1} 25%, transparent 25%, transparent 75%, ${patternColor2} 75%),` +
     `linear-gradient(-45deg, ${patternColor2} 25%, transparent 25%, transparent 75%, ${patternColor1} 75%)`;
@@ -98,7 +94,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         backgroundImage: `linear-gradient(${cardBgColor}, ${cardBgColor}), ${borderGradient}`,
         padding: borderPadding,
         display: "flex",
-          overflow: "visible", 
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
@@ -106,43 +101,60 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         position: "relative",
         fontFamily: effectiveFont,
         boxShadow: hovered ? `0 20px 40px ${shadowColor}` : "0 0 0 transparent",
-        transform: hovered ? "translateY(-50px)" : "translateY(0)",
+        transform: hovered ? "translateY(0)" : "translateY(0)",
+        /* ALLOW IMAGE TO BREAK OUT TOP */
+        overflow: "visible",
+        zIndex: hovered ? 50 : 1,
       } as React.CSSProperties}
     >
-      {/* Dynamic Radial Glow */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        borderRadius: '24px',
-        opacity: hovered ? 1 : 0,
-        transition: 'opacity 0.5s',
-        background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, ${borderColor}11 0%, transparent 70%)`,
-        pointerEvents: 'none'
-      }} />
-
+      {/* Pattern & Background Layer */}
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          position: "absolute",
+          inset: 0,
           borderRadius: "18px",
           background: cardBgColor,
-          overflow: "visible",
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
           backgroundImage: pattern,
           backgroundSize: "24px 24px",
           backgroundPosition: hovered ? "12px 12px" : "0px 0px",
           transition: "background-position 0.6s ease",
+          zIndex: 0,
+          /* CLIP SIDES AND BOTTOM ONLY */
+          overflow: "hidden",
         }}
       >
-        {/* Image Container with Zoom */}
-        <div style={{ 
-            width: "100%", 
-            height: "65%", 
-         
-            position: "relative" 
-        }}>
+        {/* Empty spacer to keep content flow if needed */}
+      </div>
+
+      {/* Main Content Wrapper */}
+      <div
+        style={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          padding: contentPadding,
+          marginTop: "65%",
+          background: cardBgColor,
+          borderRadius: "0 0 18px 18px",
+          zIndex: 10,
+        }}
+      >
+
+        {/* Image Container */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: borderPadding,
+            right: borderPadding,
+            height: "65%",
+            borderRadius: "18px 18px 0 0",
+            overflow: "hidden",
+            zIndex: 5,
+            transition: "transform 0.6s cubic-bezier(0.33, 1, 0.68, 1)",
+            transform: hovered ? "translateY(-40px)" : "translateY(0)",
+          }}
+        >
           <img
             src={image}
             alt={title}
@@ -150,21 +162,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition:"top",
-              transition: "transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)",
-              transform: hovered ? "scale(1.75) translateY(-50px)" : "scale(1)",
+              objectPosition: "top",
+              transition: "transform 0.6s cubic-bezier(0.33, 1, 0.68, 1)",
+              transform: hovered ? "scale(1.50)" : "scale(1)",
             }}
           />
-          {/* Overlay gradient for better text readability */}
-          <div style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '40%',
-              background: `linear-gradient(to top, ${cardBgColor}, transparent)`,
-              opacity: 0.6
-          }} />
         </div>
 
         {/* Content Section */}
@@ -175,14 +177,16 @@ export const InfoCard: React.FC<InfoCardProps> = ({
             flexDirection: "column",
             padding: contentPadding,
             transition: "transform 0.4s ease",
-            transform: hovered ? "translateY(-8px)" : "translateY(0)",
+         //   background: cardBgColor, // Covers the image zoom if it overlaps downwards
+            borderRadius: "0 0 18px 18px",
+            zIndex: 20
           }}
         >
           <h1
             style={{
               fontSize: 22,
               fontWeight: 800,
-              marginBottom: 12,
+              marginBottom: 8,
               color: hovered ? hoverTextColor : textColor,
               transition: "color 0.3s ease",
               position: "relative",
@@ -209,19 +213,17 @@ export const InfoCard: React.FC<InfoCardProps> = ({
           </h1>
           <p
             style={{
-              fontSize: 16,
-              fontWeight: 800,
-              lineHeight: 1.6,
-              color: hovered ? "black" : textColor,
+              fontSize: 14,
+              fontWeight: 600,
+              lineHeight: 1.5,
+             color: hovered ? hoverTextColor : textColor,
               opacity: 0.8,
               display: "-webkit-box",
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               direction: isRTL(description) ? "rtl" : "ltr",
-            
-                transition: "color 0.3s ease",
-              textAlign:"justify"
+              textAlign: "justify"
             }}
           >
             {description}
