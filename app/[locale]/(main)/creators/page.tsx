@@ -52,7 +52,7 @@ export const Demo: React.FC = () => {
                 />
 
                 {/* Card Wrapper */}
-                <div className="relative bg-[#111111] rounded-2xl overflow-hidden border border-white/5 transition-colors duration-500">
+                <div className="relative bg-[#111111] rounded-2xl border border-white/5 transition-colors duration-500">
                   <InfoCard
                     image={card.image}
                     title={card.title}

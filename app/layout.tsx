@@ -5,6 +5,7 @@ import "./globals.css";
 import StoreProvider from "@/lib/providers/StoreProvider";
 
 import { Toaster } from "sonner";
+import Cursor from "@/components/cursor/cursor";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>
+          <Cursor />
           {children}  
              <Toaster position="top-right" richColors />
         </StoreProvider>

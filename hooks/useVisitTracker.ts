@@ -3,114 +3,157 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
-// ─── Config ───────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────────────────────
 
 const TRACK_ENDPOINT = "/api/analytics/track";
-const PING_INTERVAL = 30_000; // 30 seconds (keeps session "active")
-const SESSION_KEY = "va_session_id";
+const PING_INTERVAL  = 30_000;
+const SESSION_KEY    = "reborn_va_session_id";
+const LOCALE_RE      = /^\/(en|ta|fr|de|es|ja|ko|zh|ar|pt|ru|hi)(?=\/|$)/;
+const DEDUP_WINDOW_MS = 1000;
 
-// ─── Session ID ───────────────────────────────────────────────────────────────
 
-function getSessionId(): string {
+// ─────────────────────────────────────────────────────────────
+// StrictMode-safe module state (NOT inside component)
+// ─────────────────────────────────────────────────────────────
+
+let _lastTrackedPath: string | null = null;
+let _lastTrackedTime = 0;
+let _inflightPath: string | null = null;
+
+
+// ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
+
+function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
 
-  let id = sessionStorage.getItem(SESSION_KEY);
-  if (!id) {
-    // Fall back to localStorage so it survives multiple tabs but resets on
-    // browser close if you switch the key to sessionStorage-only below.
-    id = localStorage.getItem(SESSION_KEY);
-  }
+  let id =
+    sessionStorage.getItem(SESSION_KEY) ??
+    localStorage.getItem(SESSION_KEY);
+
   if (!id) {
     id = crypto.randomUUID();
     try {
       sessionStorage.setItem(SESSION_KEY, id);
       localStorage.setItem(SESSION_KEY, id);
     } catch {
-      // Private browsing — carry on
+      // ignore private mode failures
     }
   }
+
   return id;
 }
 
-// ─── Core send ────────────────────────────────────────────────────────────────
+function stripLocale(path: string): string {
+  return path.replace(LOCALE_RE, "") || "/";
+}
 
-async function sendTrack(payload: Record<string, unknown>): Promise<string | null> {
+async function sendTrack(
+  payload: Record<string, unknown>
+): Promise<string | null> {
   try {
     const res = await fetch(TRACK_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-      // keepalive so it fires even during page unload
       keepalive: true,
     });
+
     if (!res.ok) return null;
-    const data = await res.json();
+
+    const data = (await res.json()) as { pageViewId?: string };
     return data.pageViewId ?? null;
   } catch {
     return null;
   }
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
+// Hook
+// ─────────────────────────────────────────────────────────────
 
 export function useVisitTracker() {
-  const pathname = usePathname();
-  const sessionIdRef = useRef<string>("");
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rawPathname = usePathname();
+  const pathname = stripLocale(rawPathname);
+
   const pageViewIdRef = useRef<string | null>(null);
-  const pageStartRef = useRef<number>(Date.now());
+  const pageStartRef  = useRef<number>(Date.now());
+  const intervalRef   = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Init session ID once
+  // ───────────────────────────────────────────────────────────
+  // Pageview Tracking (StrictMode-safe)
+  // ───────────────────────────────────────────────────────────
+
   useEffect(() => {
-    sessionIdRef.current = getSessionId();
-  }, []);
+    const sid = getOrCreateSessionId();
+    if (!sid) return;
 
-  // Track page views + duration whenever pathname changes
-  useEffect(() => {
-    if (!sessionIdRef.current) return;
+    const now = Date.now();
 
-    // Send duration for the *previous* page before tracking the new one
-    const prevPageViewId = pageViewIdRef.current;
-    const prevStart = pageStartRef.current;
+    // Dedup within short time window (StrictMode protection)
+    if (
+      _lastTrackedPath === pathname &&
+      now - _lastTrackedTime < DEDUP_WINDOW_MS
+    ) {
+      return;
+    }
 
-    if (prevPageViewId) {
-      const duration = Math.round((Date.now() - prevStart) / 1000);
-      sendTrack({
-        sessionId: sessionIdRef.current,
-        pageViewId: prevPageViewId,
+    // Prevent duplicate inflight calls
+    if (_inflightPath === pathname) return;
+
+    // Send duration for previous page (if exists)
+    if (pageViewIdRef.current && _lastTrackedPath !== pathname) {
+      const duration = Math.round(
+        (now - pageStartRef.current) / 1000
+      );
+
+      void sendTrack({
+        type: "duration",
+        sessionId: sid,
+        pageViewId: pageViewIdRef.current,
         duration,
-        pathname,
       });
     }
 
-    // Track the new page view
-    pageStartRef.current = Date.now();
+    _inflightPath = pathname;
+    _lastTrackedPath = pathname;
+    _lastTrackedTime = now;
+
+    pageStartRef.current = now;
     pageViewIdRef.current = null;
 
-    sendTrack({
-      sessionId: sessionIdRef.current,
+    void sendTrack({
+      type: "pageview",
+      sessionId: sid,
       pathname,
       title: document.title,
       referrer: document.referrer || null,
     }).then((pvId) => {
       pageViewIdRef.current = pvId;
+      _inflightPath = null;
     });
+
   }, [pathname]);
 
-  // Keep-alive ping every 30s
-  useEffect(() => {
-    if (!sessionIdRef.current) return;
 
-    // Clear any existing interval
+  // ───────────────────────────────────────────────────────────
+  // Keepalive Ping
+  // ───────────────────────────────────────────────────────────
+
+  useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
-      if (document.visibilityState === "hidden") return; // don't ping hidden tabs
-      sendTrack({
-        sessionId: sessionIdRef.current,
-        pathname,
-        title: document.title,
-        referrer: null,
+      const sid = getOrCreateSessionId();
+      if (!sid || document.visibilityState === "hidden") return;
+
+      void sendTrack({
+        type: "ping",
+        sessionId: sid,
       });
     }, PING_INTERVAL);
 
@@ -119,35 +162,41 @@ export function useVisitTracker() {
     };
   }, [pathname]);
 
-  // Send final duration on tab close / navigation away
+
+  // ───────────────────────────────────────────────────────────
+  // Flush Duration on Page Hide / Close
+  // ───────────────────────────────────────────────────────────
+
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (!sessionIdRef.current || !pageViewIdRef.current) return;
-      const duration = Math.round((Date.now() - pageStartRef.current) / 1000);
-      // sendBeacon is fire-and-forget, perfect for unload
+    const flush = () => {
+      const sid = getOrCreateSessionId();
+      if (!sid || !pageViewIdRef.current) return;
+
+      const duration = Math.round(
+        (Date.now() - pageStartRef.current) / 1000
+      );
+
       navigator.sendBeacon(
         TRACK_ENDPOINT,
         JSON.stringify({
-          sessionId: sessionIdRef.current,
+          type: "duration",
+          sessionId: sid,
           pageViewId: pageViewIdRef.current,
           duration,
-          pathname,
         })
       );
     };
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        handleBeforeUnload();
-      }
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
     };
 
-    window.addEventListener("pagehide", handleBeforeUnload);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      window.removeEventListener("pagehide", handleBeforeUnload);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [pathname]);
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDB } from "@/lib/mongodb"; // your existing db module
+import { getDB } from "@/lib/mongodb";
 import {
   getClientIP,
   getGeoInfo,
@@ -13,82 +13,104 @@ import type { TrackPayload, VisitorSession, PageView } from "@/types/visitor";
 
 export const runtime = "nodejs";
 
+// Supported locales — keep in sync with useVisitTracker.ts
+const LOCALE_RE = /^\/(en|ta|fr|de|es|ja|ko|zh|ar|pt|ru|hi)(?=\/|$)/;
+
+function stripLocale(path: string): string {
+  return path.replace(LOCALE_RE, "") || "/";
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body: TrackPayload = await req.json();
-    const { sessionId, pathname, title, referrer, pageViewId, duration } = body;
+    const body = await req.json() as TrackPayload & { type?: string };
+    const { sessionId, pageViewId, duration, pathname, title, referrer } = body;
+    const type = body.type ?? "pageview"; // default to pageview for legacy payloads
 
-    // ── Validate ────────────────────────────────────────────────────────────
+    // ── Basic validation ──────────────────────────────────────────────────
     if (!sessionId || !isValidUUID(sessionId)) {
       return NextResponse.json({ error: "Invalid session ID" }, { status: 400 });
     }
 
-    const db = await getDB();
+    const db        = await getDB();
     const visitsCol = db.collection<VisitorSession>("site_visits");
-    const pvCol = db.collection<PageView>("page_views");
+    const pvCol     = db.collection<PageView>("page_views");
 
-    // ── Duration update only ────────────────────────────────────────────────
-    // When the user is leaving a page we receive a pageViewId + duration
-    if (pageViewId && duration !== undefined) {
-      if (!isValidUUID(pageViewId)) {
-        return NextResponse.json({ error: "Invalid pageViewId" }, { status: 400 });
-      }
-      await pvCol.updateOne(
-        { _id: pageViewId as any },
-        { $set: { duration: Math.min(Math.round(duration), 86400) } }
+    // ── PING — only update lastActive, nothing else ───────────────────────
+    if (type === "ping") {
+      await visitsCol.updateOne(
+        { sessionId },
+        { $set: { lastActive: new Date() } }
       );
       return NextResponse.json({ ok: true });
     }
 
-    // ── Full track ──────────────────────────────────────────────────────────
-    const ip = getClientIP(req.headers);
-    const ua = req.headers.get("user-agent") || "unknown";
-    const cleanPath = sanitizePathname(pathname || "/");
+    // ── DURATION — update existing page view duration only ────────────────
+    if (type === "duration" || (pageViewId && duration !== undefined)) {
+      if (!pageViewId || !isValidUUID(pageViewId)) {
+        return NextResponse.json({ error: "Invalid pageViewId" }, { status: 400 });
+      }
+      await pvCol.updateOne(
+        { _id: pageViewId as any },
+        { $set: { duration: Math.min(Math.round(duration ?? 0), 86_400) } }
+      );
+      // Also keep session alive
+      await visitsCol.updateOne(
+        { sessionId },
+        { $set: { lastActive: new Date() } }
+      );
+      return NextResponse.json({ ok: true });
+    }
 
-    // Check if session already exists to avoid redundant geo lookups
+    // ── PAGEVIEW — upsert session + insert page view ───────────────────────
+    const ip        = getClientIP(req.headers);
+    const ua        = req.headers.get("user-agent") || "unknown";
+    // Strip locale both from what the hook sends AND as a safety net
+    const cleanPath = stripLocale(sanitizePathname(pathname || "/"));
+    const now       = new Date();
+
+    // Resolve geo — reuse existing session data or same-IP cache first
     const existingSession = await visitsCol.findOne(
       { sessionId },
-      { projection: { country: 1, lat: 1, lon: 1 } }
+      { projection: { country: 1, countryCode: 1, region: 1, city: 1, lat: 1, lon: 1 } }
     );
 
-    let geo = null;
+    let geo: Awaited<ReturnType<typeof getGeoInfo>> = null;
+
     if (!existingSession?.country) {
-      // Try to reuse geo from same IP first (cheaper)
-      const sameIPSession = await visitsCol.findOne(
-        { ipAddress: ip, country: { $ne: null } },
+      const sameIP = await visitsCol.findOne(
+        { ipAddress: ip, country: { $nin: [null, "Local"] } },
         { projection: { country: 1, countryCode: 1, region: 1, city: 1, lat: 1, lon: 1 } }
       );
 
-      if (sameIPSession?.country) {
+      if (sameIP?.country) {
         geo = {
-          country: sameIPSession.country,
-          countryCode: sameIPSession.countryCode,
-          regionName: sameIPSession.region,
-          city: sameIPSession.city,
-          lat: sameIPSession.lat,
-          lon: sameIPSession.lon,
-        };
+          country:     sameIP.country,
+          countryCode: sameIP.countryCode,
+          regionName:  sameIP.region,
+          city:        sameIP.city,
+          lat:         sameIP.lat,
+          lon:         sameIP.lon,
+        } as any;
       } else {
         geo = await getGeoInfo(ip);
       }
     }
 
-    // Upsert session
-    const now = new Date();
+    // Build session update
     const sessionUpdate: Partial<VisitorSession> = {
       lastActive: now,
-      ipAddress: ip,
-      userAgent: ua,
-      pathname: cleanPath,
+      ipAddress:  ip,
+      userAgent:  ua,
+      pathname:   cleanPath,
     };
 
     if (geo) {
-      sessionUpdate.country = geo.country ?? null;
+      sessionUpdate.country     = (geo as any).country     ?? null;
       sessionUpdate.countryCode = (geo as any).countryCode ?? null;
-      sessionUpdate.region = (geo as any).regionName ?? null;
-      sessionUpdate.city = (geo as any).city ?? null;
-      sessionUpdate.lat = geo.lat ?? null;
-      sessionUpdate.lon = geo.lon ?? null;
+      sessionUpdate.region      = (geo as any).regionName  ?? null;
+      sessionUpdate.city        = (geo as any).city        ?? null;
+      sessionUpdate.lat         = (geo as any).lat         ?? null;
+      sessionUpdate.lon         = (geo as any).lon         ?? null;
     }
 
     await visitsCol.updateOne(
@@ -97,24 +119,44 @@ export async function POST(req: NextRequest) {
         $set: sessionUpdate,
         $setOnInsert: {
           sessionId,
-          device: parseDevice(ua),
-          browser: parseBrowser(ua),
-          os: parseOS(ua),
-          referrer: referrer ?? null,
+          device:    parseDevice(ua),
+          browser:   parseBrowser(ua),
+          os:        parseOS(ua),
+          referrer:  referrer ?? null,
           createdAt: now,
         },
       },
       { upsert: true }
     );
 
+    // ── Dedup guard — block duplicate page views within 5 seconds ───────────
+    // Catches: React StrictMode double-fire, browser refresh, fast back/forward
+    const fiveSecondsAgo  = new Date(Date.now() - 5_000);
+    const recentDuplicate = await pvCol.findOne(
+      {
+        sessionId,
+        pathname:  cleanPath,
+        timestamp: { $gte: fiveSecondsAgo },
+      },
+      { projection: { _id: 1 } }
+    );
+
+    if (recentDuplicate) {
+      // Already recorded this page for this session in the last 5s — skip insert
+      return NextResponse.json({
+        ok: true,
+        pageViewId: recentDuplicate._id.toString(),
+      });
+    }
+
     // Insert page view
     const pvDoc: PageView = {
       sessionId,
-      pathname: cleanPath,
-      title: title?.slice(0, 255) ?? null,
-      referrer: referrer?.slice(0, 500) ?? null,
+      pathname:  cleanPath,
+      title:     title?.slice(0, 255) ?? null,
+      referrer:  referrer?.slice(0, 500) ?? null,
       timestamp: now,
-      duration: null,
+      duration:  null,
     };
     const pvResult = await pvCol.insertOne(pvDoc as any);
 
@@ -122,6 +164,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       pageViewId: pvResult.insertedId.toString(),
     });
+
   } catch (err) {
     console.error("[track] error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

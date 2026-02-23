@@ -33,13 +33,30 @@ function startOfMonth(): Date {
   return d;
 }
 
+// ─── Shared filters — applied everywhere to exclude localhost/dev traffic ─────
+
+/** Filter for site_visits collection */
+const REAL_VISIT = {
+  ipAddress: { $nin: ["::1", "127.0.0.1", "::ffff:127.0.0.1"] },
+  country:   { $nin: [null, "Local"] },
+};
+
+/** Filter for page_views collection — exclude sessions from localhost visits.
+ *  We do this via a $lookup-free approach: filter by referrer not being localhost
+ *  AND rely on the fact that sessions created from ::1 have country "Local".
+ *  The simplest approach: keep a set of real sessionIds is expensive, so instead
+ *  we exclude page views whose referrer is localhost (covers most cases). */
+const REAL_PV = {
+  referrer: { $not: { $regex: "^http://(localhost|127\\.0\\.0\\.1)" } },
+};
+
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export async function GET(_req: NextRequest) {
   try {
-    const db = await getDB();
+    const db     = await getDB();
     const visits = db.collection("site_visits");
-    const pvCol = db.collection("page_views");
+    const pvCol  = db.collection("page_views");
 
     const thirtySecondsAgo = new Date(Date.now() - 30_000);
 
@@ -64,28 +81,45 @@ export async function GET(_req: NextRequest) {
       durationStats,
     ] = await Promise.all([
 
-      // ── Active now (last 30s) ────────────────────────────────────────────────
-      visits.countDocuments({ lastActive: { $gte: thirtySecondsAgo } }),
+      // ── Active now (last 30s, real visitors only) ──────────────────────────
+      visits.countDocuments({
+        ...REAL_VISIT,
+        lastActive: { $gte: thirtySecondsAgo },
+      }),
 
-      // ── Today ────────────────────────────────────────────────────────────────
-      visits.countDocuments({ createdAt: { $gte: startOfToday() } }),
+      // ── Today ─────────────────────────────────────────────────────────────
+      visits.countDocuments({
+        ...REAL_VISIT,
+        createdAt: { $gte: startOfToday() },
+      }),
 
-      // ── This week ────────────────────────────────────────────────────────────
-      visits.countDocuments({ createdAt: { $gte: startOfWeek() } }),
+      // ── This week ─────────────────────────────────────────────────────────
+      visits.countDocuments({
+        ...REAL_VISIT,
+        createdAt: { $gte: startOfWeek() },
+      }),
 
-      // ── This month ───────────────────────────────────────────────────────────
-      visits.countDocuments({ createdAt: { $gte: startOfMonth() } }),
+      // ── This month ────────────────────────────────────────────────────────
+      visits.countDocuments({
+        ...REAL_VISIT,
+        createdAt: { $gte: startOfMonth() },
+      }),
 
-      // ── Total visitors ───────────────────────────────────────────────────────
-      visits.countDocuments(),
+      // ── Total visitors ────────────────────────────────────────────────────
+      visits.countDocuments(REAL_VISIT),
 
-      // ── Total page views ─────────────────────────────────────────────────────
-      pvCol.countDocuments(),
+      // ── Total page views ──────────────────────────────────────────────────
+      pvCol.countDocuments(REAL_PV),
 
-      // ── Hourly trend (last 24h) ───────────────────────────────────────────────
+      // ── Hourly trend (last 24h) ────────────────────────────────────────────
       pvCol
         .aggregate([
-          { $match: { timestamp: { $gte: new Date(Date.now() - 86_400_000) } } },
+          {
+            $match: {
+              ...REAL_PV,
+              timestamp: { $gte: new Date(Date.now() - 86_400_000) },
+            },
+          },
           { $group: { _id: { $hour: "$timestamp" }, count: { $sum: 1 } } },
           { $sort: { _id: 1 } },
           {
@@ -99,45 +133,55 @@ export async function GET(_req: NextRequest) {
         .toArray()
         .then((rows) =>
           rows.map((r) => ({
-            hour: r.hour as string,
+            hour:  r.hour  as string,
             count: r.count as number,
           }))
         ),
 
-      // ── Daily growth (last 30 days) ───────────────────────────────────────────
+      // ── Daily growth (last 30 days) ────────────────────────────────────────
       pvCol
         .aggregate([
-          { $match: { timestamp: { $gte: daysAgo(30) } } },
+          {
+            $match: {
+              ...REAL_PV,
+              timestamp: { $gte: daysAgo(30) },
+            },
+          },
           {
             $group: {
-              _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+              _id:      { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
               pageViews: { $sum: 1 },
-              visitors: { $addToSet: "$sessionId" },
+              visitors:  { $addToSet: "$sessionId" },
             },
           },
           { $sort: { _id: 1 } },
           {
             $project: {
               _id: 0,
-              date: "$_id",
+              date:      "$_id",
               pageViews: 1,
-              visitors: { $size: "$visitors" },
+              visitors:  { $size: "$visitors" },
             },
           },
         ])
         .toArray()
         .then((rows) =>
           rows.map((r) => ({
-            date: r.date as string,
+            date:      r.date      as string,
             pageViews: r.pageViews as number,
-            visitors: r.visitors as number,
+            visitors:  r.visitors  as number,
           }))
         ),
 
-      // ── Device distribution (last 7 days) ────────────────────────────────────
+      // ── Device distribution (last 7 days) ─────────────────────────────────
       visits
         .aggregate([
-          { $match: { createdAt: { $gte: daysAgo(7) } } },
+          {
+            $match: {
+              ...REAL_VISIT,
+              createdAt: { $gte: daysAgo(7) },
+            },
+          },
           { $group: { _id: "$device", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -145,16 +189,21 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.count as number), 0) || 1;
           return rows.map((r) => ({
-            device: (r._id as string) || "Unknown",
-            count: r.count as number,
+            device:     (r._id as string) || "Unknown",
+            count:      r.count as number,
             percentage: parseFloat((((r.count as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── Browser distribution (last 7 days) ───────────────────────────────────
+      // ── Browser distribution (last 7 days) ────────────────────────────────
       visits
         .aggregate([
-          { $match: { createdAt: { $gte: daysAgo(7) } } },
+          {
+            $match: {
+              ...REAL_VISIT,
+              createdAt: { $gte: daysAgo(7) },
+            },
+          },
           { $group: { _id: "$browser", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -162,16 +211,21 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.count as number), 0) || 1;
           return rows.map((r) => ({
-            browser: (r._id as string) || "Unknown",
-            count: r.count as number,
+            browser:    (r._id as string) || "Unknown",
+            count:      r.count as number,
             percentage: parseFloat((((r.count as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── OS distribution (last 7 days) ────────────────────────────────────────
+      // ── OS distribution (last 7 days) ─────────────────────────────────────
       visits
         .aggregate([
-          { $match: { createdAt: { $gte: daysAgo(7) } } },
+          {
+            $match: {
+              ...REAL_VISIT,
+              createdAt: { $gte: daysAgo(7) },
+            },
+          },
           { $group: { _id: "$os", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -179,26 +233,26 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.count as number), 0) || 1;
           return rows.map((r) => ({
-            os: (r._id as string) || "Unknown",
-            count: r.count as number,
+            os:         (r._id as string) || "Unknown",
+            count:      r.count as number,
             percentage: parseFloat((((r.count as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── Top countries (last 30 days) ─────────────────────────────────────────
+      // ── Top countries (last 30 days) ───────────────────────────────────────
       visits
         .aggregate([
           {
             $match: {
+              ...REAL_VISIT,
               createdAt: { $gte: daysAgo(30) },
-              country: { $ne: null },
             },
           },
           {
             $group: {
-              _id: "$country",
+              _id:         "$country",
               countryCode: { $first: "$countryCode" },
-              visitors: { $sum: 1 },
+              visitors:    { $sum: 1 },
             },
           },
           { $sort: { visitors: -1 } },
@@ -208,21 +262,26 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.visitors as number), 0) || 1;
           return rows.map((r) => ({
-            country: r._id as string,
+            country:     r._id         as string,
             countryCode: (r.countryCode as string) ?? null,
-            visitors: r.visitors as number,
-            percentage: parseFloat((((r.visitors as number) / total) * 100).toFixed(1)),
+            visitors:    r.visitors    as number,
+            percentage:  parseFloat((((r.visitors as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── Top pages (last 30 days) ──────────────────────────────────────────────
+      // ── Top pages (last 30 days) ───────────────────────────────────────────
       pvCol
         .aggregate([
-          { $match: { timestamp: { $gte: daysAgo(30) } } },
+          {
+            $match: {
+              ...REAL_PV,
+              timestamp: { $gte: daysAgo(30) },
+            },
+          },
           {
             $group: {
-              _id: "$pathname",
-              views: { $sum: 1 },
+              _id:         "$pathname",
+              views:       { $sum: 1 },
               avgDuration: { $avg: "$duration" },
             },
           },
@@ -231,8 +290,8 @@ export async function GET(_req: NextRequest) {
           {
             $project: {
               _id: 0,
-              pathname: "$_id",
-              views: 1,
+              pathname:    "$_id",
+              views:       1,
               avgDuration: { $round: [{ $ifNull: ["$avgDuration", 0] }, 0] },
             },
           },
@@ -240,19 +299,20 @@ export async function GET(_req: NextRequest) {
         .toArray()
         .then((rows) =>
           rows.map((r) => ({
-            pathname: r.pathname as string,
-            views: r.views as number,
+            pathname:    r.pathname    as string,
+            views:       r.views      as number,
             avgDuration: r.avgDuration as number,
           }))
         ),
 
-      // ── Top regions (last 30 days) ────────────────────────────────────────────
+      // ── Top regions (last 30 days) ─────────────────────────────────────────
       visits
         .aggregate([
           {
             $match: {
+              ...REAL_VISIT,
               createdAt: { $gte: daysAgo(30) },
-              region: { $ne: null },
+              region:    { $nin: [null, "Localhost"] },
             },
           },
           { $group: { _id: "$region", visitors: { $sum: 1 } } },
@@ -263,19 +323,20 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.visitors as number), 0) || 1;
           return rows.map((r) => ({
-            region: r._id as string,
-            visitors: r.visitors as number,
+            region:     r._id      as string,
+            visitors:   r.visitors as number,
             percentage: parseFloat((((r.visitors as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── Visitor locations for map (last 30 days) ──────────────────────────────
+      // ── Visitor locations for map (last 30 days) ───────────────────────────
       visits
         .find(
           {
+            ...REAL_VISIT,
             createdAt: { $gte: daysAgo(30) },
-            lat: { $ne: null },
-            lon: { $ne: null },
+            lat: { $nin: [null, 0] },
+            lon: { $nin: [null, 0] },
           },
           { projection: { sessionId: 1, country: 1, region: 1, lat: 1, lon: 1 } }
         )
@@ -283,17 +344,22 @@ export async function GET(_req: NextRequest) {
         .then((rows) =>
           rows.map((r) => ({
             sessionId: r.sessionId as string,
-            country: (r.country as string) ?? "",
-            region: (r.region as string) ?? null,
-            lat: r.lat as number,
-            lon: r.lon as number,
+            country:   (r.country  as string) ?? "",
+            region:    (r.region   as string) ?? null,
+            lat:       r.lat       as number,
+            lon:       r.lon       as number,
           }))
         ),
 
-      // ── Peak hours (last 7 days, top 5) ──────────────────────────────────────
+      // ── Peak hours (last 7 days) ───────────────────────────────────────────
       pvCol
         .aggregate([
-          { $match: { timestamp: { $gte: daysAgo(7) } } },
+          {
+            $match: {
+              ...REAL_PV,
+              timestamp: { $gte: daysAgo(7) },
+            },
+          },
           { $group: { _id: { $hour: "$timestamp" }, count: { $sum: 1 } } },
           { $sort: { count: -1 } },
           { $limit: 5 },
@@ -302,19 +368,19 @@ export async function GET(_req: NextRequest) {
         .toArray()
         .then((rows) =>
           rows.map((r) => ({
-            hour: r.hour as number,
+            hour:  r.hour  as number,
             count: r.count as number,
           }))
         ),
 
-      // ── Top referrers (last 30 days) ──────────────────────────────────────────
-      // Fixed: duplicate $ne key replaced with $not + $in
+      // ── Top referrers (last 30 days) ───────────────────────────────────────
       pvCol
         .aggregate([
           {
             $match: {
+              ...REAL_PV,
               timestamp: { $gte: daysAgo(30) },
-              referrer: { $not: { $in: [null, ""] } },
+              referrer:  { $not: { $in: [null, ""] } },
             },
           },
           { $group: { _id: "$referrer", count: { $sum: 1 } } },
@@ -326,25 +392,30 @@ export async function GET(_req: NextRequest) {
         .then((rows) =>
           rows.map((r) => ({
             referrer: r.referrer as string,
-            count: r.count as number,
+            count:    r.count    as number,
           }))
         ),
 
-      // ── Avg session duration & bounce rate ────────────────────────────────────
+      // ── Avg session duration & bounce rate (last 30 days) ─────────────────
       pvCol
         .aggregate([
-          { $match: { timestamp: { $gte: daysAgo(30) } } },
+          {
+            $match: {
+              ...REAL_PV,
+              timestamp: { $gte: daysAgo(30) },
+            },
+          },
           {
             $group: {
-              _id: "$sessionId",
-              pageCount: { $sum: 1 },
+              _id:           "$sessionId",
+              pageCount:     { $sum: 1 },
               totalDuration: { $sum: { $ifNull: ["$duration", 0] } },
             },
           },
           {
             $group: {
-              _id: null,
-              avgDuration: { $avg: "$totalDuration" },
+              _id:             null,
+              avgDuration:     { $avg: "$totalDuration" },
               bouncedSessions: {
                 $sum: { $cond: [{ $eq: ["$pageCount", 1] }, 1, 0] },
               },
@@ -356,9 +427,9 @@ export async function GET(_req: NextRequest) {
     ]);
 
     const durationRow = durationStats[0] ?? {
-      avgDuration: 0,
+      avgDuration:     0,
       bouncedSessions: 0,
-      totalSessions: 0,
+      totalSessions:   0,
     };
 
     const result: VisitorStats = {
@@ -374,7 +445,7 @@ export async function GET(_req: NextRequest) {
           ? parseFloat(
               (
                 ((durationRow.bouncedSessions as number) /
-                  (durationRow.totalSessions as number)) *
+                  (durationRow.totalSessions  as number)) *
                 100
               ).toFixed(1)
             )

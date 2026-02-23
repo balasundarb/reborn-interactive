@@ -97,8 +97,8 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         backgroundClip: "padding-box, border-box",
         backgroundImage: `linear-gradient(${cardBgColor}, ${cardBgColor}), ${borderGradient}`,
         padding: borderPadding,
-        boxSizing: "border-box",
         display: "flex",
+          overflow: "visible", 
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
@@ -106,7 +106,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         position: "relative",
         fontFamily: effectiveFont,
         boxShadow: hovered ? `0 20px 40px ${shadowColor}` : "0 0 0 transparent",
-        transform: hovered ? "translateY(-5px)" : "translateY(0)",
+        transform: hovered ? "translateY(-50px)" : "translateY(0)",
       } as React.CSSProperties}
     >
       {/* Dynamic Radial Glow */}
@@ -126,7 +126,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
           height: "100%",
           borderRadius: "18px",
           background: cardBgColor,
-          overflow: "hidden",
+          overflow: "visible",
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -140,7 +140,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
         <div style={{ 
             width: "100%", 
             height: "65%", 
-            overflow: "hidden",
+         
             position: "relative" 
         }}>
           <img
@@ -152,7 +152,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
               objectFit: "cover",
               objectPosition:"top",
               transition: "transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)",
-              transform: hovered ? "scale(1.15)" : "scale(1)",
+              transform: hovered ? "scale(1.75) translateY(-50px)" : "scale(1)",
             }}
           />
           {/* Overlay gradient for better text readability */}
