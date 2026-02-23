@@ -98,7 +98,7 @@ export function GetInTouch({ isOpen, onClose }: GetInTouchProps) {
           ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Animated Accent Progress Line */}
-        <div className="absolute top-0 left-0 h-[3px] w-full overflow-hidden bg-white/5">
+        <div className="absolute top-0 left-0 h-0.75 w-full overflow-hidden bg-white/5">
           <div
             className="h-full transition-all duration-700 ease-out"
             style={{
@@ -176,8 +176,8 @@ export function GetInTouch({ isOpen, onClose }: GetInTouchProps) {
                animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both"
               >
                 <span className="relative z-10">Go Back</span>
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-neutral-200 group-hover:bg-black transition-colors" />
-                <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-black group-hover:w-full transition-all duration-500" />
+                <div className="absolute bottom-0 left-0 w-full h-px bg-neutral-200 group-hover:bg-black transition-colors" />
+                <div className="absolute bottom-0 left-0 w-0 h-px bg-black group-hover:w-full transition-all duration-500" />
               </button>
             </div>
           ) : (

@@ -417,7 +417,7 @@ const HeroSection: React.FC = () => {
           </svg>
 
           <div className="absolute top-8 left-2 text-[8px] text-white/25 tracking-wider glow-w">{time}</div>
-          <div className="absolute top-[50px] left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
+          <div className="absolute top-12.5 left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
         </div>
 
         {/* ── TOP-RIGHT ── */}
@@ -431,14 +431,14 @@ const HeroSection: React.FC = () => {
             <line x1="160" y1="70" x2="130" y2="70" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
             <circle cx="80" cy="0" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
-          <div className="absolute top-[10px] right-10 text-[9px] text-[#d63031]/58 tracking-widest uppercase glow-r text-right">
+          <div className="absolute top-2.5 right-10 text-[9px] text-[#d63031]/58 tracking-widest uppercase glow-r text-right">
             REBORN INTERACTIVE
           </div>
           <div className="absolute top-8 right-4 flex items-center gap-1.5">
             {/* CSS-only pulse ring — no JS */}
             <div className="relative w-2 h-2">
               <div className="absolute inset-0 rounded-full border border-[#d63031] anim-pulse-ring" />
-              <div className="absolute inset-[2px] rounded-full bg-[#d63031]"
+              <div className="absolute inset-0.5 rounded-full bg-[#d63031]"
                 style={{ boxShadow: "0 0 5px #d63031" }} />
             </div>
             <span className="text-[8px] text-white/25 tracking-wider">LIVE</span>
