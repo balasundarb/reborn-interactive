@@ -7,7 +7,7 @@ const ACCENT_RED = "#d63031";
 const CARD_DATA = [
   { id: "1", image: "/assets/team/ajay_rahul.webp", title: "Ajay Rahul", description: "The Managing Director oversees strategy, finance, and operations of the game development company." },
   { id: "2", image: "/assets/team/balasundar.webp", title: "Balasundar", description: "Creates visual assets for games, including UI elements and promotional materials." },
-  { id: "3", image: "/assets/team/Shekinah.jpg", title: "Shekinah Florance M", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
+  { id: "3", image: "/assets/team/shekinah.png", title: "Shekinah Florance M", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
   { id: "4", image: "/assets/team/jegan.webp", title: "Jegan", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
   { id: "5", image: "/assets/team/vishnu.webp", title: "Vishnu", description: "Builds and maintains backend services, APIs, databases, and game dashboards." },
 ];

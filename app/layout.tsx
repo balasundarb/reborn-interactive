@@ -6,6 +6,7 @@ import StoreProvider from "@/lib/providers/StoreProvider";
 
 import { Toaster } from "sonner";
 import Cursor from "@/components/cursor/cursor";
+import { Lollipop, SquareScissorsIcon } from "lucide-react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -37,18 +38,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-     
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>
           <Cursor />
-          {children}  
-             <Toaster position="top-right" richColors />
+          {children}
+          <Toaster position="top-right" toastOptions={{
+            duration: 5000,
+            }}
+            icons={{
+              success: <SquareScissorsIcon />,
+              error: <Lollipop />
+            }} />
         </StoreProvider>
-        
+
       </body>
-      
+
     </html>
   );
 }

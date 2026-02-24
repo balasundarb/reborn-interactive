@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { User, Lock, ArrowRight, Github, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { FaGoogle } from "react-icons/fa";
+import { toast } from 'sonner';
 interface LoginFormProps {
     onSubmit?: (email: string, password: string) => Promise<void> | void;
     onSocialLogin?: (provider: 'google' | 'facebook' | 'github' | 'apple' | 'twitter') => void;
@@ -57,17 +58,17 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             await onSubmit(email, password);
         } else {
             const { authClient } = await import('@/lib/auth-client');
-            const res = await authClient.signIn.email({ email, password });
+            const res = await authClient.signIn.email({ email, password ,callbackURL: '/adminpanel'});
 
             if (res.error) {
-                throw new Error(res.error.message || "Invalid credentials");
+                    toast.error(res.error.message || "Invalid credentials");
             }
 
-            window.location.href = "/";
+         
         }
 
     } catch (error: any) {
-        alert(error.message || 'Login failed');
+         toast.custom(error.message || "Invalid credentials");
     } finally {
         setIsLoading(false);
     }

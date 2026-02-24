@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { FaGoogle } from "react-icons/fa";
 import { authClient } from '@/lib/auth-client';
+import { toast } from 'sonner';
 interface SignupFormProps {
   onSignup?: (data: any) => Promise<void> | void;
   onSocialSignup?: (provider: string) => void;
@@ -43,11 +44,11 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
          window.location.href = '/'; // Redirect after signup
         }
           if(error){
-            throw new Error(error.message);
+             toast.error(error.message || "Invalid credentials");
           }
       }
     } catch (error: any) {
-      alert(error.message || 'Signup failed');
+      toast.error(error.message || 'Signup failed');
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,8 @@ import type { VisitorStats } from "@/types/visitor";
 
 export const runtime = "nodejs";
 
+const IS_DEV = process.env.NODE_ENV === "development";
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function daysAgo(n: number): Date {
@@ -33,22 +35,16 @@ function startOfMonth(): Date {
   return d;
 }
 
-// ─── Shared filters — applied everywhere to exclude localhost/dev traffic ─────
+// ─── Visitor filter ───────────────────────────────────────────────────────────
+// Dev:  no filter — show all traffic including localhost for easier testing
+// Prod: exclude localhost IPs and the "Local" country placeholder
 
-/** Filter for site_visits collection */
-const REAL_VISIT = {
-  ipAddress: { $nin: ["::1", "127.0.0.1", "::ffff:127.0.0.1"] },
-  country:   { $nin: [null, "Local"] },
-};
-
-/** Filter for page_views collection — exclude sessions from localhost visits.
- *  We do this via a $lookup-free approach: filter by referrer not being localhost
- *  AND rely on the fact that sessions created from ::1 have country "Local".
- *  The simplest approach: keep a set of real sessionIds is expensive, so instead
- *  we exclude page views whose referrer is localhost (covers most cases). */
-const REAL_PV = {
-  referrer: { $not: { $regex: "^http://(localhost|127\\.0\\.0\\.1)" } },
-};
+const REAL_VISIT = IS_DEV
+  ? {}
+  : {
+      ipAddress: { $nin: ["::1", "127.0.0.1", "::ffff:127.0.0.1"] },
+      country:   { $nin: [null, "Local"] },
+    };
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
@@ -59,6 +55,23 @@ export async function GET(_req: NextRequest) {
     const pvCol  = db.collection("page_views");
 
     const thirtySecondsAgo = new Date(Date.now() - 30_000);
+
+    // ── Resolve real session IDs ──────────────────────────────────────────────
+    // Derive REAL_PV from REAL_VISIT so visitors and page views are always
+    // in sync — if a session is excluded from visitors, its page views are too.
+    const realSessionIds = await visits
+      .find(REAL_VISIT, { projection: { sessionId: 1, _id: 0 } })
+      .toArray()
+      .then((rows) => rows.map((r) => r.sessionId as string));
+
+    // Return empty stats if no sessions exist yet (fresh DB)
+    if (realSessionIds.length === 0) {
+      return NextResponse.json(emptyStats(), {
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
+
+    const REAL_PV = { sessionId: { $in: realSessionIds } };
 
     const [
       activeNow,
@@ -81,37 +94,37 @@ export async function GET(_req: NextRequest) {
       durationStats,
     ] = await Promise.all([
 
-      // ── Active now (last 30s, real visitors only) ──────────────────────────
+      // ── Active now (last 30s) ─────────────────────────────────────────────────
       visits.countDocuments({
         ...REAL_VISIT,
         lastActive: { $gte: thirtySecondsAgo },
       }),
 
-      // ── Today ─────────────────────────────────────────────────────────────
+      // ── Today ─────────────────────────────────────────────────────────────────
       visits.countDocuments({
         ...REAL_VISIT,
         createdAt: { $gte: startOfToday() },
       }),
 
-      // ── This week ─────────────────────────────────────────────────────────
+      // ── This week ─────────────────────────────────────────────────────────────
       visits.countDocuments({
         ...REAL_VISIT,
         createdAt: { $gte: startOfWeek() },
       }),
 
-      // ── This month ────────────────────────────────────────────────────────
+      // ── This month ────────────────────────────────────────────────────────────
       visits.countDocuments({
         ...REAL_VISIT,
         createdAt: { $gte: startOfMonth() },
       }),
 
-      // ── Total visitors ────────────────────────────────────────────────────
+      // ── Total visitors ────────────────────────────────────────────────────────
       visits.countDocuments(REAL_VISIT),
 
-      // ── Total page views ──────────────────────────────────────────────────
+      // ── Total page views ──────────────────────────────────────────────────────
       pvCol.countDocuments(REAL_PV),
 
-      // ── Hourly trend (last 24h) ────────────────────────────────────────────
+      // ── Hourly trend (last 24h) ───────────────────────────────────────────────
       pvCol
         .aggregate([
           {
@@ -125,20 +138,17 @@ export async function GET(_req: NextRequest) {
           {
             $project: {
               _id: 0,
-              hour: { $concat: [{ $toString: "$_id" }, ":00"] },
+              hour:  { $concat: [{ $toString: "$_id" }, ":00"] },
               count: 1,
             },
           },
         ])
         .toArray()
         .then((rows) =>
-          rows.map((r) => ({
-            hour:  r.hour  as string,
-            count: r.count as number,
-          }))
+          rows.map((r) => ({ hour: r.hour as string, count: r.count as number }))
         ),
 
-      // ── Daily growth (last 30 days) ────────────────────────────────────────
+      // ── Daily growth (last 30 days) ───────────────────────────────────────────
       pvCol
         .aggregate([
           {
@@ -149,7 +159,7 @@ export async function GET(_req: NextRequest) {
           },
           {
             $group: {
-              _id:      { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+              _id:       { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
               pageViews: { $sum: 1 },
               visitors:  { $addToSet: "$sessionId" },
             },
@@ -173,15 +183,10 @@ export async function GET(_req: NextRequest) {
           }))
         ),
 
-      // ── Device distribution (last 7 days) ─────────────────────────────────
+      // ── Device distribution (last 7 days) ─────────────────────────────────────
       visits
         .aggregate([
-          {
-            $match: {
-              ...REAL_VISIT,
-              createdAt: { $gte: daysAgo(7) },
-            },
-          },
+          { $match: { ...REAL_VISIT, createdAt: { $gte: daysAgo(7) } } },
           { $group: { _id: "$device", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -195,15 +200,10 @@ export async function GET(_req: NextRequest) {
           }));
         }),
 
-      // ── Browser distribution (last 7 days) ────────────────────────────────
+      // ── Browser distribution (last 7 days) ────────────────────────────────────
       visits
         .aggregate([
-          {
-            $match: {
-              ...REAL_VISIT,
-              createdAt: { $gte: daysAgo(7) },
-            },
-          },
+          { $match: { ...REAL_VISIT, createdAt: { $gte: daysAgo(7) } } },
           { $group: { _id: "$browser", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -217,15 +217,10 @@ export async function GET(_req: NextRequest) {
           }));
         }),
 
-      // ── OS distribution (last 7 days) ─────────────────────────────────────
+      // ── OS distribution (last 7 days) ─────────────────────────────────────────
       visits
         .aggregate([
-          {
-            $match: {
-              ...REAL_VISIT,
-              createdAt: { $gte: daysAgo(7) },
-            },
-          },
+          { $match: { ...REAL_VISIT, createdAt: { $gte: daysAgo(7) } } },
           { $group: { _id: "$os", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
@@ -239,15 +234,10 @@ export async function GET(_req: NextRequest) {
           }));
         }),
 
-      // ── Top countries (last 30 days) ───────────────────────────────────────
+      // ── Top countries (last 30 days) ───────────────────────────────────────────
       visits
         .aggregate([
-          {
-            $match: {
-              ...REAL_VISIT,
-              createdAt: { $gte: daysAgo(30) },
-            },
-          },
+          { $match: { ...REAL_VISIT, createdAt: { $gte: daysAgo(30) } } },
           {
             $group: {
               _id:         "$country",
@@ -262,22 +252,17 @@ export async function GET(_req: NextRequest) {
         .then((rows) => {
           const total = rows.reduce((s, r) => s + (r.visitors as number), 0) || 1;
           return rows.map((r) => ({
-            country:     r._id         as string,
+            country:     r._id          as string,
             countryCode: (r.countryCode as string) ?? null,
-            visitors:    r.visitors    as number,
+            visitors:    r.visitors     as number,
             percentage:  parseFloat((((r.visitors as number) / total) * 100).toFixed(1)),
           }));
         }),
 
-      // ── Top pages (last 30 days) ───────────────────────────────────────────
+      // ── Top pages (last 30 days) ───────────────────────────────────────────────
       pvCol
         .aggregate([
-          {
-            $match: {
-              ...REAL_PV,
-              timestamp: { $gte: daysAgo(30) },
-            },
-          },
+          { $match: { ...REAL_PV, timestamp: { $gte: daysAgo(30) } } },
           {
             $group: {
               _id:         "$pathname",
@@ -305,7 +290,7 @@ export async function GET(_req: NextRequest) {
           }))
         ),
 
-      // ── Top regions (last 30 days) ─────────────────────────────────────────
+      // ── Top regions (last 30 days) ─────────────────────────────────────────────
       visits
         .aggregate([
           {
@@ -329,7 +314,7 @@ export async function GET(_req: NextRequest) {
           }));
         }),
 
-      // ── Visitor locations for map (last 30 days) ───────────────────────────
+      // ── Visitor locations for map (last 30 days) ───────────────────────────────
       visits
         .find(
           {
@@ -351,15 +336,10 @@ export async function GET(_req: NextRequest) {
           }))
         ),
 
-      // ── Peak hours (last 7 days) ───────────────────────────────────────────
+      // ── Peak hours (last 7 days) ───────────────────────────────────────────────
       pvCol
         .aggregate([
-          {
-            $match: {
-              ...REAL_PV,
-              timestamp: { $gte: daysAgo(7) },
-            },
-          },
+          { $match: { ...REAL_PV, timestamp: { $gte: daysAgo(7) } } },
           { $group: { _id: { $hour: "$timestamp" }, count: { $sum: 1 } } },
           { $sort: { count: -1 } },
           { $limit: 5 },
@@ -367,13 +347,10 @@ export async function GET(_req: NextRequest) {
         ])
         .toArray()
         .then((rows) =>
-          rows.map((r) => ({
-            hour:  r.hour  as number,
-            count: r.count as number,
-          }))
+          rows.map((r) => ({ hour: r.hour as number, count: r.count as number }))
         ),
 
-      // ── Top referrers (last 30 days) ───────────────────────────────────────
+      // ── Top referrers (last 30 days) ───────────────────────────────────────────
       pvCol
         .aggregate([
           {
@@ -390,21 +367,13 @@ export async function GET(_req: NextRequest) {
         ])
         .toArray()
         .then((rows) =>
-          rows.map((r) => ({
-            referrer: r.referrer as string,
-            count:    r.count    as number,
-          }))
+          rows.map((r) => ({ referrer: r.referrer as string, count: r.count as number }))
         ),
 
-      // ── Avg session duration & bounce rate (last 30 days) ─────────────────
+      // ── Avg session duration & bounce rate (last 30 days) ─────────────────────
       pvCol
         .aggregate([
-          {
-            $match: {
-              ...REAL_PV,
-              timestamp: { $gte: daysAgo(30) },
-            },
-          },
+          { $match: { ...REAL_PV, timestamp: { $gte: daysAgo(30) } } },
           {
             $group: {
               _id:           "$sessionId",
@@ -473,4 +442,30 @@ export async function GET(_req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// ─── Empty stats fallback ─────────────────────────────────────────────────────
+
+function emptyStats(): VisitorStats {
+  return {
+    activeNow:          0,
+    today:              0,
+    week:               0,
+    month:              0,
+    totalVisitors:      0,
+    totalPageViews:     0,
+    avgSessionDuration: 0,
+    bounceRate:         0,
+    hourlyTrend:        [],
+    dailyGrowth:        [],
+    devices:            [],
+    browsers:           [],
+    operatingSystems:   [],
+    topCountries:       [],
+    topPages:           [],
+    topRegions:         [],
+    locations:          [],
+    peakHours:          [],
+    referrers:          [],
+  };
 }

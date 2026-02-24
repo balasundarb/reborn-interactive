@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 import { getDB } from "@/lib/mongodb";
 import {
   getClientIP,
@@ -46,11 +47,11 @@ export async function POST(req: NextRequest) {
 
     // ── DURATION — update existing page view duration only ────────────────
     if (type === "duration" || (pageViewId && duration !== undefined)) {
-      if (!pageViewId || !isValidUUID(pageViewId)) {
+      if (!pageViewId || !ObjectId.isValid(pageViewId)) {
         return NextResponse.json({ error: "Invalid pageViewId" }, { status: 400 });
       }
-      await pvCol.updateOne(
-        { _id: pageViewId as any },
+      await (pvCol as any).updateOne(
+        { _id: new ObjectId(pageViewId) },          // ← proper ObjectId cast
         { $set: { duration: Math.min(Math.round(duration ?? 0), 86_400) } }
       );
       // Also keep session alive
