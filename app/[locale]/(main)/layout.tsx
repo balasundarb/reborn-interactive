@@ -1,9 +1,10 @@
-// app/[locale]/(main)/layout.tsx
 import { NextIntlClientProvider } from 'next-intl';
 import { MyNavbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from '@/components/layout/scrollToTop';
-import { VisitorTracker } from '@/components/layout/visitTracker'; // ← import
+import { VisitorTracker } from '@/components/layout/visitTracker';
+import PageTransition from '@/components/shared/PageTransition';
+import NetflixRedTransition from '@/components/shared/NetflixRedTransition';
 
 type Props = {
   children: React.ReactNode;
@@ -13,14 +14,16 @@ export default function MainLayout({ children }: Props) {
   return (
     <NextIntlClientProvider>
       <div className="relative w-full min-h-screen overflow-x-hidden">
-        <VisitorTracker /> {/* ← drop it here, renders nothing */}
+        <VisitorTracker />
         <MyNavbar />
         <main>
-          {children}
+          <NetflixRedTransition>
+            {children}
+          </NetflixRedTransition>
         </main>
         <Footer />
         <ScrollToTop />
       </div>
-    </NextIntlClientProvider>
+    </NextIntlClientProvider >
   );
 }

@@ -1,4 +1,3 @@
-// app/[locale]/(main)/page.tsx
 "use client";
 
 import Careers from "@/components/landingpage/Careers";
@@ -16,5 +15,5 @@ const HomePage = () => {
     </>
   );
 };
-  
+
 export default HomePage;

@@ -1,5 +1,6 @@
 "use client";
-import React, { useRef, useState, useEffect, useCallback } from "react";
+
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 
 // ─── Particle type ────────────────────────────────────────────────────────────
 interface Particle {
@@ -9,51 +10,89 @@ interface Particle {
   alpha: number; alphaDir: number;
 }
 
-// ─── Pre-bake glow dot into an offscreen canvas (called once per size) ────────
-// This eliminates per-frame shadowBlur — the #1 Canvas2D perf killer.
-function bakeGlowSprite(radius: number): HTMLCanvasElement {
-  const size = Math.ceil(radius * 8);
-  const oc = document.createElement("canvas");
-  oc.width = oc.height = size;
-  const c = oc.getContext("2d")!;
-  const cx = size / 2;
-  // Soft halo
-  const halo = c.createRadialGradient(cx, cx, 0, cx, cx, size / 2);
-  halo.addColorStop(0, "rgba(214,48,49,0.55)");
-  halo.addColorStop(0.45, "rgba(214,48,49,0.15)");
-  halo.addColorStop(1, "rgba(214,48,49,0)");
-  c.fillStyle = halo;
-  c.fillRect(0, 0, size, size);
-  // Bright core
-  const core = c.createRadialGradient(cx, cx, 0, cx, cx, radius * 1.1);
-  core.addColorStop(0, "rgba(255,140,140,1)");
-  core.addColorStop(1, "rgba(214,48,49,0)");
-  c.fillStyle = core;
-  c.beginPath();
-  c.arc(cx, cx, radius * 1.1, 0, Math.PI * 2);
-  c.fill();
-  return oc;
-}
+// ─── Pre-bake glow dot into an offscreen canvas ──────────────────────────────
+const bakeGlowSprite = (() => {
+  const cache = new Map<number, HTMLCanvasElement>();
+
+  return (radius: number): HTMLCanvasElement => {
+    if (cache.has(radius)) return cache.get(radius)!;
+
+    const size = Math.ceil(radius * 8);
+    const oc = document.createElement("canvas")!;
+    oc.width = oc.height = size;
+    const c = oc.getContext("2d")!;
+    const cx = size / 2;
+
+    // Soft halo
+    const halo = c.createRadialGradient(cx, cx, 0, cx, cx, size / 2);
+    halo.addColorStop(0, "rgba(214,48,49,0.55)");
+    halo.addColorStop(0.45, "rgba(214,48,49,0.15)");
+    halo.addColorStop(1, "rgba(214,48,49,0)");
+    c.fillStyle = halo;
+    c.fillRect(0, 0, size, size);
+
+    // Bright core
+    const core = c.createRadialGradient(cx, cx, 0, cx, cx, radius * 1.1);
+    core.addColorStop(0, "rgba(255,140,140,1)");
+    core.addColorStop(1, "rgba(214,48,49,0)");
+    c.fillStyle = core;
+    c.beginPath();
+    c.arc(cx, cx, radius * 1.1, 0, Math.PI * 2);
+    c.fill();
+
+    cache.set(radius, oc);
+    return oc;
+  };
+})();
 
 // ─── Debounce — prevents resize thrashing ─────────────────────────────────────
-function debounce<T extends (...a: unknown[]) => void>(fn: T, ms: number): T {
+function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
   let timer: ReturnType<typeof setTimeout>;
-  return ((...a) => { clearTimeout(timer); timer = setTimeout(() => fn(...a), ms); }) as T;
+  return ((...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  }) as T;
 }
 
-// ─── Ease-out-expo ────────────────────────────────────────────────────────────
+// ─── Ease functions ───────────────────────────────────────────────────────────
 const easeOutExpo = (p: number) => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+// ─── Memoized HUD Components ──────────────────────────────────────────────────
+const HUDCorner = React.memo(({ position, delay, children, loaded }: {
+  position: string;
+  delay: number;
+  children?: React.ReactNode;
+  loaded: boolean;
+}) => (
+  <div
+    className={`absolute ${position} transition-opacity duration-500`}
+    style={{
+      opacity: loaded ? 1 : 0,
+      transitionDelay: `${delay}s`
+    }}
+  >
+    {children}
+  </div>
+));
+
+HUDCorner.displayName = 'HUDCorner';
 
 const HeroSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chargeBarRef = useRef<HTMLDivElement>(null);   // CSS-var charge, no setState
+  const chargeBarRef = useRef<HTMLDivElement>(null);
   const parallaxHudRef = useRef<HTMLDivElement>(null);
   const parallaxTitleRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
-  const loadedFiredRef = useRef(false);                    // guard double-fire
+  const loadedFiredRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [time, setTime] = useState("00:00:00");
+  const [videoError, setVideoError] = useState(false);
+
+  // Pre-bake sprites once at top level
+  const sprites = useMemo(() => [1.1, 1.6, 2.1].map(bakeGlowSprite), []);
 
   // ── Clock (1s interval, negligible cost) ──────────────────────────────────
   useEffect(() => {
@@ -69,35 +108,48 @@ const HeroSection: React.FC = () => {
   const handleVideoReady = useCallback(() => {
     if (loadedFiredRef.current) return;
     loadedFiredRef.current = true;
-    setLoaded(true);
+
+    // Add smooth delay for transition
+    setTimeout(() => {
+      setLoaded(true);
+    }, 200);
   }, []);
 
-  // Fallback: show UI even if video never fires (dev / missing file)
+  const handleVideoError = useCallback(() => {
+    setVideoError(true);
+    handleVideoReady(); // Still show content even if video fails
+  }, [handleVideoReady]);
+
+  // Fallback timeout
   useEffect(() => {
-    const t = setTimeout(handleVideoReady, 900);
+    const t = setTimeout(handleVideoReady, 2500);
     return () => clearTimeout(t);
   }, [handleVideoReady]);
 
-  // ── Charge bar via CSS custom property — ZERO React re-renders ───────────
+  // ── Charge bar animation ───────────────────────────────────────────
   useEffect(() => {
     if (!loaded) return;
     const el = chargeBarRef.current;
     if (!el) return;
+
     let raf: number;
     let start: number | null = null;
     const DURATION = 3400;
+
     const step = (ts: number) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / DURATION, 1);
-      // Direct DOM property write — bypasses React scheduler & layout recalc
       el.style.setProperty("--charge", `${easeOutExpo(progress) * 100}%`);
-      if (progress < 1) raf = requestAnimationFrame(step);
+      if (progress < 1) {
+        raf = requestAnimationFrame(step);
+      }
     };
+
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [loaded]);
 
-  // ── Mouse parallax — single rAF loop, GPU-only transforms ────────────────
+  // ── Mouse parallax with smooth lerp ───────────────────────────────────────
   useEffect(() => {
     const mouse = { x: 0, y: 0 };
     const cur = { hx: 0, hy: 0, tx: 0, ty: 0 };
@@ -107,326 +159,437 @@ const HeroSection: React.FC = () => {
       mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
-    // passive: true — never blocks scroll
+
     window.addEventListener("mousemove", onMove, { passive: true });
 
     const loop = () => {
-      // Lerp at different rates per layer for depth feel
-      cur.hx += (mouse.x * 11 - cur.hx) * 0.052;
-      cur.hy += (mouse.y * 6.5 - cur.hy) * 0.052;
-      cur.tx += (mouse.x * 22 - cur.tx) * 0.036;
-      cur.ty += (mouse.y * 13 - cur.ty) * 0.036;
+      // Smooth interpolation for parallax
+      cur.hx += (mouse.x * 12 - cur.hx) * 0.05;
+      cur.hy += (mouse.y * 8 - cur.hy) * 0.05;
+      cur.tx += (mouse.x * 24 - cur.tx) * 0.035;
+      cur.ty += (mouse.y * 14 - cur.ty) * 0.035;
 
-      // translate3d → GPU composited, no layout, no paint
-      if (parallaxHudRef.current)
+      // Apply transforms with GPU acceleration
+      if (parallaxHudRef.current) {
         parallaxHudRef.current.style.transform =
           `translate3d(${cur.hx.toFixed(2)}px,${cur.hy.toFixed(2)}px,0)`;
-      if (parallaxTitleRef.current)
+      }
+      if (parallaxTitleRef.current) {
         parallaxTitleRef.current.style.transform =
           `translate3d(${cur.tx.toFixed(2)}px,${cur.ty.toFixed(2)}px,0)`;
+      }
 
       raf = requestAnimationFrame(loop);
     };
+
     raf = requestAnimationFrame(loop);
+
     return () => {
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf);
     };
   }, []);
 
-  // ── Canvas particles — sprite-stamped, no shadowBlur per frame ───────────
+  // ── Optimized particle system ─────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true })!;
 
-    // Bake 3 sprite sizes once at mount
-    const sprites = [1.1, 1.6, 2.1].map(bakeGlowSprite);
+    const ctx = canvas.getContext("2d", {
+      alpha: true,
+      desynchronized: true
+    })!;
 
-    let W = window.innerWidth, H = window.innerHeight;
-    const applySize = () => {
-      W = window.innerWidth; H = window.innerHeight;
-      canvas.width = W; canvas.height = H;
+    let W = window.innerWidth;
+    let H = window.innerHeight;
+
+    const setCanvasSize = () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
     };
-    applySize();
-    const onResize = debounce(applySize as (...a: unknown[]) => void, 130);
+
+    setCanvasSize();
+
+    const onResize = debounce(setCanvasSize, 130);
     window.addEventListener("resize", onResize);
 
-    // Spawn particles spread across full viewport from the start
-    const COUNT = 38;
-    const particles: Particle[] = Array.from({ length: COUNT }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.22,
-      vy: -(0.22 + Math.random() * 0.52),
+    // Dynamic particle count based on screen size
+    const PARTICLE_COUNT = Math.min(32, Math.floor((W * H) / 35000));
+
+    const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: -(0.15 + Math.random() * 0.35),
       spriteIdx: Math.floor(Math.random() * sprites.length),
-      alpha: 0.08 + Math.random() * 0.42,
+      alpha: 0.1 + Math.random() * 0.4,
       alphaDir: Math.random() > 0.5 ? 1 : -1,
     }));
 
     let animId: number;
-    const draw = () => {
+    let lastTime = 0;
+    const FPS = 60;
+    const frameInterval = 1000 / FPS;
+
+    const draw = (currentTime: number) => {
+      animId = requestAnimationFrame(draw);
+
+      // Throttle frame rate
+      if (currentTime - lastTime < frameInterval) return;
+      lastTime = currentTime;
+
       ctx.clearRect(0, 0, W, H);
 
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha += p.alphaDir * 0.0022;
-        if (p.alpha > 0.52) { p.alpha = 0.52; p.alphaDir = -1; }
-        if (p.alpha < 0.04) { p.alpha = 0.04; p.alphaDir = 1; }
-        if (p.y < -24) { p.y = H + 12; p.x = Math.random() * W; }
+        p.alpha += p.alphaDir * 0.002;
 
-        // Stamp pre-baked sprite — zero GPU stall, no per-call shadowBlur
+        if (p.alpha > 0.5) {
+          p.alpha = 0.5;
+          p.alphaDir = -1;
+        }
+        if (p.alpha < 0.05) {
+          p.alpha = 0.05;
+          p.alphaDir = 1;
+        }
+
+        // Wrap around screen
+        if (p.y < -30) {
+          p.y = H + 30;
+          p.x = Math.random() * W;
+        }
+        if (p.y > H + 30) {
+          p.y = -30;
+          p.x = Math.random() * W;
+        }
+        if (p.x < -30) p.x = W + 30;
+        if (p.x > W + 30) p.x = -30;
+
         const sp = sprites[p.spriteIdx];
         ctx.globalAlpha = p.alpha;
         ctx.drawImage(sp, p.x - sp.width / 2, p.y - sp.height / 2);
       }
       ctx.globalAlpha = 1;
-      animId = requestAnimationFrame(draw);
     };
-    draw();
+
+    animId = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [sprites]);
+
+  // ── Intersection Observer for lazy loading ─────────────────────────────────
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && videoRef.current && !videoError) {
+            videoRef.current.play().catch(() => {
+              setVideoError(true);
+            });
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [videoError]);
 
   return (
     <section
+      ref={containerRef}
       id="home"
       aria-label="Game intro hero"
       role="banner"
       className="relative flex items-center justify-center h-screen overflow-hidden bg-[#020202]"
       style={{ fontFamily: "'Share Tech Mono', monospace" }}
     >
-      {/* ─────────────────────────────────────────────
-          STYLES
-      ───────────────────────────────────────────── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel+Decorative:wght@900&display=swap');
 
         :root {
-          --z-bg:      0;
-          --z-fx:      2;
-          --z-ptcl:    5;
-          --z-ovl:     8;
-          --z-ui:     10;
-          --z-hud:    20;
-          --z-tick:   25;
-          /* charge bar driven by JS via setProperty — no React re-render */
-          --charge:    0%;
+          --z-bg: 0;
+          --z-fx: 2;
+          --z-ptcl: 5;
+          --z-ovl: 8;
+          --z-ui: 10;
+          --z-hud: 20;
+          --charge: 0%;
         }
 
-        /* ── Keyframes ── */
         @keyframes scanline {
-          from { transform: translate3d(0,-100%,0); }
-          to   { transform: translate3d(0,100vh,0); }
+          0% { transform: translate3d(0,-100%,0); }
+          100% { transform: translate3d(0,100vh,0); }
         }
+        
         @keyframes blink {
-          0%,49%   { opacity: 1; }
+          0%,49% { opacity: 1; }
           50%,100% { opacity: 0; }
         }
-        @keyframes ticker {
-          from { transform: translate3d(0,0,0); }
-          to   { transform: translate3d(-50%,0,0); }
-        }
+        
         @keyframes pulse-ring {
-          0%   { transform: scale(1);   opacity: .75; }
-          100% { transform: scale(2.6); opacity: 0;   }
+          0% { transform: scale(1); opacity: 0.75; }
+          100% { transform: scale(2.6); opacity: 0; }
         }
+        
         @keyframes hud-draw {
-          from { stroke-dashoffset: 300; opacity: 0; }
-          to   { stroke-dashoffset: 0;   opacity: 1; }
+          0% { stroke-dashoffset: 300; opacity: 0; }
+          100% { stroke-dashoffset: 0; opacity: 1; }
         }
-        @keyframes title-in {
-          from { opacity: 0; transform: translate3d(0,28px,0); }
-          to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-
-        /* Glitch: pseudo-elements, CSS-only, idles 90% of time */
-        @keyframes glitch-gate {
-          0%,88%,100% { opacity: 0; }
-          89%,91%,93%,95%,97% { opacity: 1; }
-        }
-        @keyframes glitch-a {
-          0%   { clip-path: inset(40% 0 50% 0); transform: translate3d(-5px,0,0); }
-          25%  { clip-path: inset(8%  0 82% 0); transform: translate3d( 5px,0,0); }
-          50%  { clip-path: inset(65% 0 8%  0); transform: translate3d(-3px,0,0); }
-          75%  { clip-path: inset(24% 0 56% 0); transform: translate3d( 4px,0,0); }
-          100% { clip-path: inset(40% 0 50% 0); transform: translate3d(-5px,0,0); }
-        }
-        @keyframes glitch-b {
-          0%   { clip-path: inset(60% 0 22% 0); transform: translate3d(4px,0,0);  color: rgba(0,255,255,.9); }
-          33%  { clip-path: inset(5%  0 77% 0); transform: translate3d(-5px,0,0); color: rgba(255,0,255,.9); }
-          66%  { clip-path: inset(78% 0 5%  0); transform: translate3d(3px,0,0);  color: rgba(0,255,255,.9); }
-          100% { clip-path: inset(60% 0 22% 0); transform: translate3d(4px,0,0);  color: rgba(0,255,255,.9); }
+        
+        @keyframes glitch {
+          0%, 100% { transform: translate(0); }
+          10% { transform: translate(-2px, 1px); }
+          20% { transform: translate(2px, -1px); }
+          30% { transform: translate(-1px, 2px); }
+          40% { transform: translate(1px, -2px); }
+          50% { transform: translate(-2px, 1px); }
+          60% { transform: translate(2px, -1px); }
+          70% { transform: translate(-1px, 2px); }
+          80% { transform: translate(1px, -2px); }
         }
 
-        /* ── GPU promotion helpers ── */
-        .gpu        { will-change: transform;  transform: translateZ(0); }
-        .gpu-fade   { will-change: opacity; }
+        @keyframes fadeUp {
+          from { 
+            opacity: 0; 
+            transform: translate3d(0, 30px, 0);
+            filter: blur(10px);
+          }
+          to { 
+            opacity: 1; 
+            transform: translate3d(0, 0, 0);
+            filter: blur(0px);
+          }
+        }
 
-        /* ── Charge bar — height driven by CSS var, not React state ── */
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .gpu { 
+          will-change: transform; 
+          transform: translateZ(0); 
+          backface-visibility: hidden;
+        }
+        
+        .gpu-fade { 
+          will-change: opacity; 
+        }
+
         .charge-fill {
           height: var(--charge);
           background: linear-gradient(to top, #d63031 0%, rgba(214,48,49,.3) 100%);
           box-shadow: 0 0 8px #d63031, 0 0 22px rgba(214,48,49,.22);
           will-change: height;
+          transition: height 0.1ms linear;
         }
 
-        /* ── Glitch headline ── */
-        .glitch { position: relative; display: inline-block; }
+        .glitch {
+          position: relative;
+          display: inline-block;
+          animation: glitch 3s infinite;
+        }
+        
         .glitch::before,
         .glitch::after {
           content: attr(data-text);
-          position: absolute; inset: 0;
-          font: inherit; letter-spacing: inherit; color: inherit;
-          pointer-events: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0.8;
         }
+        
         .glitch::before {
-          animation:
-            glitch-gate 9s step-end infinite,
-            glitch-a    0.17s steps(1) infinite;
-          will-change: transform, clip-path, opacity;
+          color: #ff00ff;
+          z-index: -1;
+          transform: translate(-2px, 0);
+          animation: glitch 0.3s infinite reverse;
         }
+        
         .glitch::after {
-          animation:
-            glitch-gate 9s step-end infinite .07s,
-            glitch-b    0.17s steps(1) infinite;
-          will-change: transform, clip-path, opacity;
+          color: #00ffff;
+          z-index: -2;
+          transform: translate(2px, 0);
+          animation: glitch 0.3s infinite;
         }
 
-        /* ── Utility animations ── */
         .anim-scanline {
-          animation: scanline 4.5s linear infinite;
+          animation: scanline 8s linear infinite;
           will-change: transform;
         }
-        .anim-blink  { animation: blink 1s step-end infinite; }
-        .anim-ticker {
-          animation: ticker 14s linear infinite;
-          will-change: transform;
+        
+        .anim-blink {
+          animation: blink 1.5s step-end infinite;
         }
-        .anim-ticker:hover { animation-play-state: paused; cursor: default; }
+        
         .anim-pulse-ring {
           animation: pulse-ring 2.2s ease-out infinite;
           will-change: transform, opacity;
         }
 
-        /* ── CRT phosphor glow ── */
-        .glow-r { text-shadow: 0 0 6px rgba(214,48,49,.85), 0 0 18px rgba(214,48,49,.3); }
-        .glow-w { text-shadow: 0 0 5px rgba(255,255,255,.4), 0 0 14px rgba(255,255,255,.1); }
+        .glow-r { 
+          text-shadow: 0 0 10px rgba(214,48,49,.9), 0 0 30px rgba(214,48,49,.4); 
+        }
+        
+        .glow-w { 
+          text-shadow: 0 0 8px rgba(255,255,255,.5), 0 0 20px rgba(255,255,255,.2); 
+        }
 
-        /* ── Signal strength bars ── */
-        .sig      { display: inline-block; background: #d63031; }
-        .sig.on   { box-shadow: 0 0 4px #d63031; }
-        .sig.off  { opacity: .14; }
+        .video-overlay {
+          transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        /* ── Respect reduce-motion ── */
+        .title-fade {
+          transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hud-element {
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
-            animation-duration: .01ms !important;
+            animation-duration: 0.01ms !important;
             animation-iteration-count: 1 !important;
-            transition-duration: .01ms !important;
+            transition-duration: 0.01ms !important;
           }
         }
       `}</style>
 
-      {/* ─────────────────────────────────────────────
-          VIDEO BACKGROUND
-      ───────────────────────────────────────────── */}
-      <video
-        ref={videoRef}
-        aria-hidden="true"
-        src="video/Intro.webm"
-        poster="/assets/hero/intro.png"
-        autoPlay loop muted playsInline preload="auto"
-        onCanPlay={handleVideoReady}
-        onLoadedData={handleVideoReady}
-        className="absolute inset-0 w-full h-full object-cover gpu"
-        style={{ zIndex: "var(--z-bg)" as any }}
-      >
-        <source src="video/Intro.webm" type="video/webm" />
-      </video>
+      {/* Video Background */}
+      {!videoError && (
+        <video
+          ref={videoRef}
+          aria-hidden="true"
+          poster="/assets/hero/intro.png"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          onCanPlay={handleVideoReady}
+          onLoadedData={handleVideoReady}
+          onError={handleVideoError}
+          className={`absolute inset-0 w-full h-full object-cover gpu video-overlay ${loaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          style={{
+            zIndex: "var(--z-bg)",
+          }}
+        >
+          <source src="video/Intro.webm" type="video/webm" />
+        </video>
+      )}
 
-      {/* ─────────────────────────────────────────────
-          PARTICLES CANVAS
-      ───────────────────────────────────────────── */}
+      {/* Fallback gradient if video fails */}
+      {videoError && (
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#020202]"
+          style={{ zIndex: "var(--z-bg)" }}
+        />
+      )}
+
+      {/* Particles Canvas */}
       <canvas
         ref={canvasRef}
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none gpu"
-        style={{ zIndex: "var(--z-ptcl)" as any }}
+        style={{ zIndex: "var(--z-ptcl)" }}
       />
 
-      {/* ─────────────────────────────────────────────
-          OVERLAY STACK  (pure CSS, no JS, no animation)
-      ───────────────────────────────────────────── */}
-      {/* Vignette */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse at center, transparent 28%, rgba(2,2,2,.9) 100%)",
-        zIndex: "var(--z-fx)" as any,
-      }} />
-      {/* Top/bottom gradient */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{
-        background: "linear-gradient(to bottom, rgba(2,2,2,.5) 0%, transparent 20%, transparent 55%, rgba(2,2,2,.96) 100%)",
-        zIndex: "var(--z-fx)" as any,
-      }} />
-      {/* Static scanlines — single repeating-gradient, zero JS */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.07) 2px, rgba(0,0,0,.07) 4px)",
-        zIndex: "var(--z-fx)" as any,
-      }} />
-      {/* Animated scanline sweep */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-28 pointer-events-none anim-scanline" style={{
-        background: "linear-gradient(to bottom, transparent, rgba(214,48,49,.04) 50%, transparent)",
-        zIndex: "var(--z-ovl)" as any,
-      }} />
-      {/* Noise grain — smaller tile = lighter paint */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{
-        opacity: .04,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "200px 200px",
-        zIndex: "var(--z-ovl)" as any,
-      }} />
+      {/* Overlay Stack */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 28%, rgba(2,2,2,.9) 100%)",
+          zIndex: "var(--z-fx)"
+        }}
+      />
 
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(to bottom, rgba(2,2,2,.5) 0%, transparent 20%, transparent 55%, rgba(2,2,2,.96) 100%)",
+          zIndex: "var(--z-fx)"
+        }}
+      />
 
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.07) 2px, rgba(0,0,0,.07) 4px)",
+          zIndex: "var(--z-fx)"
+        }}
+      />
 
-      {/* ─────────────────────────────────────────────
-          HUD CORNERS  (single parallax group, GPU layer)
-      ───────────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-28 pointer-events-none anim-scanline gpu"
+        style={{
+          background: "linear-gradient(to bottom, transparent, rgba(214,48,49,.04) 50%, transparent)",
+          zIndex: "var(--z-ovl)"
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          opacity: .04,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundSize: "200px 200px",
+          zIndex: "var(--z-ovl)"
+        }}
+      />
+
+      {/* HUD Corners */}
       <div
         ref={parallaxHudRef}
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none gpu"
-        style={{ zIndex: "var(--z-hud)" as any }}
+        style={{ zIndex: "var(--z-hud)" }}
       >
-        {/* ── TOP-LEFT ── */}
-        <div className="absolute top-0 left-0"
-          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .3s" }}>
+        <HUDCorner position="top-0 left-0" delay={0.3} loaded={loaded}>
           <svg width="180" height="140" viewBox="0 0 180 140" fill="none">
             <path d="M0 70 L0 8 Q0 0 8 0 L90 0" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded ? "hud-draw 1s ease-out .4s both" : "none" }} />
+              style={{ animation: loaded ? "hud-draw 1s ease-out 0.4s both" : "none" }} />
             <path d="M0 70 L0 8" stroke="#d63031" strokeWidth="3" strokeOpacity=".18" />
             <line x1="0" y1="84" x2="38" y2="84" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
             <line x1="0" y1="96" x2="22" y2="96" stroke="#d63031" strokeWidth=".5" strokeOpacity=".15" />
             <rect x="2" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9" />
             <circle cx="90" cy="0" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
-
           <div className="absolute top-8 left-2 text-[8px] text-white/25 tracking-wider glow-w">{time}</div>
-          <div className="absolute top-12.5 left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
-        </div>
+          <div className="absolute top-12 left-2 text-[7px] text-[#d63031]/35 tracking-widest uppercase">STATUS:ONLINE</div>
+        </HUDCorner>
 
-        {/* ── TOP-RIGHT ── */}
-        <div className="absolute top-0 right-0"
-          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .4s" }}>
+        <HUDCorner position="top-0 right-0" delay={0.4} loaded={loaded}>
           <svg width="160" height="120" viewBox="0 0 160 120" fill="none">
             <path d="M160 60 L160 8 Q160 0 152 0 L80 0" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded ? "hud-draw 1s ease-out .5s both" : "none" }} />
+              style={{ animation: loaded ? "hud-draw 1s ease-out 0.5s both" : "none" }} />
             <rect x="152" y="2" width="6" height="6" fill="#d63031" fillOpacity=".9" />
             <line x1="160" y1="70" x2="130" y2="70" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
             <circle cx="80" cy="0" r="2" fill="#d63031" fillOpacity=".5" />
@@ -435,7 +598,6 @@ const HeroSection: React.FC = () => {
             REBORN INTERACTIVE
           </div>
           <div className="absolute top-8 right-4 flex items-center gap-1.5">
-            {/* CSS-only pulse ring — no JS */}
             <div className="relative w-2 h-2">
               <div className="absolute inset-0 rounded-full border border-[#d63031] anim-pulse-ring" />
               <div className="absolute inset-0.5 rounded-full bg-[#d63031]"
@@ -443,28 +605,24 @@ const HeroSection: React.FC = () => {
             </div>
             <span className="text-[8px] text-white/25 tracking-wider">LIVE</span>
           </div>
-        </div>
+        </HUDCorner>
 
-        {/* ── BOTTOM-LEFT ── */}
-        <div className="absolute bottom-0 left-0"
-          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .5s" }}>
+        <HUDCorner position="bottom-0 left-0" delay={0.5} loaded={loaded}>
           <svg width="160" height="100" viewBox="0 0 160 100" fill="none">
             <path d="M0 40 L0 92 Q0 100 8 100 L80 100" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded ? "hud-draw 1s ease-out .6s both" : "none" }} />
+              style={{ animation: loaded ? "hud-draw 1s ease-out 0.6s both" : "none" }} />
             <rect x="2" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9" />
             <line x1="0" y1="30" x2="28" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
             <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5" />
           </svg>
-        </div>
+        </HUDCorner>
 
-        {/* ── BOTTOM-RIGHT — coordinates ── */}
-        <div className="absolute bottom-0 right-0"
-          style={{ opacity: loaded ? 1 : 0, transition: "opacity .5s ease .55s" }}>
+        <HUDCorner position="bottom-0 right-0" delay={0.55} loaded={loaded}>
           <svg width="160" height="100" viewBox="0 0 160 100" fill="none">
             <path d="M160 40 L160 92 Q160 100 152 100 L80 100" stroke="#d63031" strokeWidth="1.5"
               strokeDasharray="300" strokeDashoffset="300"
-              style={{ animation: loaded ? "hud-draw 1s ease-out .65s both" : "none" }} />
+              style={{ animation: loaded ? "hud-draw 1s ease-out 0.65s both" : "none" }} />
             <rect x="152" y="92" width="6" height="6" fill="#d63031" fillOpacity=".9" />
             <line x1="160" y1="30" x2="132" y2="30" stroke="#d63031" strokeWidth=".5" strokeOpacity=".28" />
             <circle cx="80" cy="100" r="2" fill="#d63031" fillOpacity=".5" />
@@ -474,41 +632,39 @@ const HeroSection: React.FC = () => {
             <div className="text-[8px] text-white/20 tracking-wider">31.2304° N</div>
             <div className="text-[8px] text-white/20 tracking-wider">121.4737° E</div>
           </div>
-        </div>
+        </HUDCorner>
       </div>
 
-      {/* ─────────────────────────────────────────────
-          CENTER CROSSHAIR
-      ───────────────────────────────────────────── */}
-      <div aria-hidden="true"
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{ zIndex: "var(--z-ui)" as any }}>
-        <div style={{ opacity: loaded ? .1 : 0, transition: "opacity 1.2s ease 1s" }}>
-          <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
-            <line x1="27" y1="0" x2="27" y2="21" stroke="#d63031" strokeWidth=".8" />
-            <line x1="27" y1="33" x2="27" y2="54" stroke="#d63031" strokeWidth=".8" />
-            <line x1="0" y1="27" x2="21" y2="27" stroke="#d63031" strokeWidth=".8" />
-            <line x1="33" y1="27" x2="54" y2="27" stroke="#d63031" strokeWidth=".8" />
-            <rect x="24" y="24" width="6" height="6" stroke="#d63031" strokeWidth=".8" fill="none" />
-          </svg>
-        </div>
+      {/* Center Crosshair */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-1000"
+        style={{
+          zIndex: "var(--z-ui)",
+          opacity: loaded ? 0.1 : 0,
+          transitionDelay: "1s"
+        }}
+      >
+        <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+          <line x1="27" y1="0" x2="27" y2="21" stroke="#d63031" strokeWidth=".8" />
+          <line x1="27" y1="33" x2="27" y2="54" stroke="#d63031" strokeWidth=".8" />
+          <line x1="0" y1="27" x2="21" y2="27" stroke="#d63031" strokeWidth=".8" />
+          <line x1="33" y1="27" x2="54" y2="27" stroke="#d63031" strokeWidth=".8" />
+          <rect x="24" y="24" width="6" height="6" stroke="#d63031" strokeWidth=".8" fill="none" />
+        </svg>
       </div>
 
-      {/* ─────────────────────────────────────────────
-          HERO HEADLINE  (own parallax group, GPU layer)
-      ───────────────────────────────────────────── */}
+      {/* Hero Headline */}
       <div
         ref={parallaxTitleRef}
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none gpu"
-        style={{ zIndex: "var(--z-ui)" as any }}
+        style={{ zIndex: "var(--z-ui)" }}
       >
-        {/* Ornamental border frame — visible BEFORE video loads, fades out once playing */}
         <div
-          className="relative flex flex-col items-center"
+          className={`relative flex flex-col items-center transition-all duration-1000 transform ${loaded ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+            }`}
           style={{
-            opacity: loaded ? 0 : 1,
-            transition: loaded ? "opacity 1.2s cubic-bezier(.4,0,.2,1)" : "none",
-            pointerEvents: "none",
+            transition: "opacity 1.2s cubic-bezier(.4,0,.2,1), transform 1.2s cubic-bezier(.4,0,.2,1)"
           }}
         >
           {/* Top ornamental rule */}
@@ -524,16 +680,17 @@ const HeroSection: React.FC = () => {
 
           {/* Corner-bracketed container */}
           <div className="relative px-6 py-2">
-            {/* Corner brackets */}
-            {[["top-0 left-0", "M0 10 L0 0 L10 0"], ["top-0 right-0", "M0 0 L10 0 L10 10"],
-            ["bottom-0 left-0", "M0 0 L0 10 L10 10"], ["bottom-0 right-0", "M10 0 L10 10 L0 10"]
+            {[
+              ["top-0 left-0", "M0 10 L0 0 L10 0"],
+              ["top-0 right-0", "M0 0 L10 0 L10 10"],
+              ["bottom-0 left-0", "M0 0 L0 10 L10 10"],
+              ["bottom-0 right-0", "M10 0 L10 10 L0 10"]
             ].map(([pos, d], i) => (
               <svg key={i} className={`absolute ${pos}`} width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d={d} stroke="#d63031" strokeWidth="1.2" strokeOpacity=".75" />
               </svg>
             ))}
 
-            {/* Glitch headline — Cinzel Decorative retro floral font */}
             <h1
               data-text="REBORN INTERACTIVE"
               className="glitch text-white uppercase"
@@ -543,7 +700,6 @@ const HeroSection: React.FC = () => {
                 fontWeight: 900,
                 lineHeight: 1,
                 letterSpacing: ".08em",
-                opacity: 1,
                 textShadow: "0 0 80px rgba(214,48,49,.2), 0 0 2px rgba(214,48,49,.4), 0 2px 0 rgba(0,0,0,.9)",
               }}
             >
@@ -563,36 +719,45 @@ const HeroSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Subtitle + animated accent line — also hides when video plays */}
-        <div className="flex items-center gap-4 mt-4"
+        {/* Subtitle */}
+        <div
+          className="flex items-center gap-4 mt-4 transition-all duration-1000"
           style={{
             opacity: loaded ? 0 : 1,
-            transition: loaded ? "opacity 1.2s cubic-bezier(.4,0,.2,1)" : "none",
-          }}>
-          <div className="h-px bg-[#d63031]" style={{
-            width: loaded ? "clamp(26px,3.5vw,50px)" : "0px",
-            transition: "width .9s cubic-bezier(.16,1,.3,1) 1.5s",
-            boxShadow: "0 0 7px #d63031",
-          }} />
-          <span className="text-[10px] tracking-[.34em] text-white/30 uppercase"
-            style={{ fontFamily: "'Share Tech Mono', monospace" }}>
+            transition: "opacity 1.2s cubic-bezier(.4,0,.2,1)"
+          }}
+        >
+          <div
+            className="h-px bg-[#d63031] transition-all duration-1000"
+            style={{
+              width: loaded ? "clamp(26px,3.5vw,50px)" : "0px",
+              transition: "width 0.9s cubic-bezier(.16,1,.3,1) 1.5s",
+              boxShadow: "0 0 7px #d63031",
+            }}
+          />
+          <span
+            className="text-[10px] tracking-[.34em] text-white/30 uppercase"
+            style={{ fontFamily: "'Share Tech Mono', monospace" }}
+          >
             PLAYER ONE<span className="anim-blink text-[#d63031]/72 ml-1">_</span>
           </span>
         </div>
       </div>
 
-
-      {/* ── Bottom red ambient glow — static CSS, zero JS ── */}
-      <div aria-hidden="true"
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none"
+      {/* Bottom red ambient glow */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none transition-opacity duration-1000"
         style={{
-          width: 700, height: 210,
+          width: 700,
+          height: 210,
           background: "radial-gradient(ellipse,rgba(214,48,49,.12) 0%,transparent 68%)",
           zIndex: 6,
+          opacity: loaded ? 0.8 : 0.4,
         }}
       />
     </section>
   );
 };
 
-export default HeroSection;
+export default React.memo(HeroSection);
