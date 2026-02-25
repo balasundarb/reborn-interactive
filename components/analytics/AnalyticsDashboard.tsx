@@ -12,6 +12,9 @@ import {
   Clock, MousePointerClick, RefreshCw, LogOut, Users,
   LayoutDashboard, Map as MapIcon, BarChart2, ChevronRight,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,20 +53,20 @@ interface CustomTooltipProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 // Dynamic values that can't be Tailwind classes
-const ACCENT        = "#d63031";
-const ACCENT_DIM    = "#b02020";
-const ACCENT_GLOW   = "rgba(214,48,49,0.12)";
+const ACCENT = "#d63031";
+const ACCENT_DIM = "#b02020";
+const ACCENT_GLOW = "rgba(214,48,49,0.12)";
 const ACCENT_BORDER = "rgba(214,48,49,0.22)";
 
-const RED_COLORS   = ["#d63031", "#c0392b", "#992d22", "#7b241c"];
-const BLUE_COLORS  = ["#74b9ff", "#0984e3", "#2980b9", "#1a5276"];
+const RED_COLORS = ["#d63031", "#c0392b", "#992d22", "#7b241c"];
+const BLUE_COLORS = ["#74b9ff", "#0984e3", "#2980b9", "#1a5276"];
 const GREEN_COLORS = ["#55efc4", "#00b894", "#00cec9", "#6c5ce7"];
 
 const TABS: TabType[] = ["overview", "pages", "geo"];
 
-const TEXT_MUTED  = "#71717a"; // zinc-500
-const TEXT_FAINT  = "#3f3f46"; // zinc-700
-const BORDER_DIM  = "rgba(255,255,255,0.06)";
+const TEXT_MUTED = "#71717a"; // zinc-500
+const TEXT_FAINT = "#3f3f46"; // zinc-700
+const BORDER_DIM = "rgba(255,255,255,0.06)";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,7 +79,7 @@ function formatDuration(s: number): string {
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
 
@@ -253,11 +256,12 @@ function BarRow({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function AnalyticsDashboard({ user, initialStats }: Props) {
-  const [stats, setStats]             = useState<VisitorStats | null>(initialStats);
-  const [loading, setLoading]         = useState(false);
+  const [stats, setStats] = useState<VisitorStats | null>(initialStats);
+  const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [activeTab, setActiveTab]     = useState<TabType>("overview");
-  const [mounted, setMounted]         = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -297,8 +301,10 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
     : (user.email?.[0]?.toUpperCase() ?? "A");
 
   const handleSignOut = async (): Promise<void> => {
-    await fetch("/api/auth/sign-out", { method: "POST" });
-    window.location.href = "/";
+    await authClient.signOut(
+      { fetchOptions: { onSuccess: () => router.push("/login"), onError: (err: any) => { toast.error(`Sign out error: ${err.message || err}`) } } }
+    );
+
   };
 
   const refMax = stats?.referrers[0]?.count ?? 1;
@@ -448,13 +454,13 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
 
           {/* ── Stat cards ── */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3 mb-7">
-            <StatCard icon={Activity}          label="Active Now"     value={stats?.activeNow ?? 0}                         iconBg="rgba(74,222,128,0.12)"  iconColor="#4ade80" live  delay={0}   />
-            <StatCard icon={Eye}               label="Today"          value={formatNumber(stats?.today ?? 0)}                iconBg="rgba(56,189,248,0.12)"  iconColor="#38bdf8"       delay={50}  />
-            <StatCard icon={TrendingUp}        label="This Week"      value={formatNumber(stats?.week ?? 0)}                 iconBg="rgba(129,140,248,0.12)" iconColor="#818cf8"       delay={100} />
-            <StatCard icon={Users}             label="This Month"     value={formatNumber(stats?.month ?? 0)}                iconBg="rgba(251,146,60,0.12)"  iconColor="#fb923c"       delay={150} />
-            <StatCard icon={Globe}             label="Total Visitors" value={formatNumber(stats?.totalVisitors ?? 0)}        iconBg={ACCENT_GLOW}            iconColor={ACCENT}        delay={200} />
-            <StatCard icon={MousePointerClick} label="Page Views"     value={formatNumber(stats?.totalPageViews ?? 0)}       iconBg="rgba(232,121,249,0.12)" iconColor="#e879f9"       delay={250} />
-            <StatCard icon={Clock}             label="Avg Duration"   value={formatDuration(stats?.avgSessionDuration ?? 0)} iconBg="rgba(45,212,191,0.12)"  iconColor="#2dd4bf" sub="per session" delay={300} />
+            <StatCard icon={Activity} label="Active Now" value={stats?.activeNow ?? 0} iconBg="rgba(74,222,128,0.12)" iconColor="#4ade80" live delay={0} />
+            <StatCard icon={Eye} label="Today" value={formatNumber(stats?.today ?? 0)} iconBg="rgba(56,189,248,0.12)" iconColor="#38bdf8" delay={50} />
+            <StatCard icon={TrendingUp} label="This Week" value={formatNumber(stats?.week ?? 0)} iconBg="rgba(129,140,248,0.12)" iconColor="#818cf8" delay={100} />
+            <StatCard icon={Users} label="This Month" value={formatNumber(stats?.month ?? 0)} iconBg="rgba(251,146,60,0.12)" iconColor="#fb923c" delay={150} />
+            <StatCard icon={Globe} label="Total Visitors" value={formatNumber(stats?.totalVisitors ?? 0)} iconBg={ACCENT_GLOW} iconColor={ACCENT} delay={200} />
+            <StatCard icon={MousePointerClick} label="Page Views" value={formatNumber(stats?.totalPageViews ?? 0)} iconBg="rgba(232,121,249,0.12)" iconColor="#e879f9" delay={250} />
+            <StatCard icon={Clock} label="Avg Duration" value={formatDuration(stats?.avgSessionDuration ?? 0)} iconBg="rgba(45,212,191,0.12)" iconColor="#2dd4bf" sub="per session" delay={300} />
             <StatCard
               icon={ChevronRight}
               label="Bounce Rate"
@@ -483,8 +489,8 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                 }
               >
                 {tab === "overview" && <BarChart2 size={13} />}
-                {tab === "pages"    && <MousePointerClick size={13} />}
-                {tab === "geo"      && <MapIcon size={13} />}
+                {tab === "pages" && <MousePointerClick size={13} />}
+                {tab === "geo" && <MapIcon size={13} />}
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
@@ -502,20 +508,20 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                     <AreaChart data={stats.dailyGrowth} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
                       <defs>
                         <linearGradient id="gV" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor={ACCENT}   stopOpacity={0.25} />
-                          <stop offset="95%" stopColor={ACCENT}   stopOpacity={0}    />
+                          <stop offset="5%" stopColor={ACCENT} stopOpacity={0.25} />
+                          <stop offset="95%" stopColor={ACCENT} stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor="#818cf8" stopOpacity={0.2} />
-                          <stop offset="95%" stopColor="#818cf8" stopOpacity={0}   />
+                          <stop offset="5%" stopColor="#818cf8" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                      <XAxis dataKey="date"  tick={axisTick} tickLine={false} axisLine={false} />
-                      <YAxis                 tick={axisTick} tickLine={false} axisLine={false} />
+                      <XAxis dataKey="date" tick={axisTick} tickLine={false} axisLine={false} />
+                      <YAxis tick={axisTick} tickLine={false} axisLine={false} />
                       <Tooltip content={<CustomTooltip />} />
                       <Legend wrapperStyle={{ fontSize: 11, color: TEXT_MUTED, paddingTop: 8 }} />
-                      <Area type="monotone" dataKey="visitors"  name="Visitors"   stroke={ACCENT}   strokeWidth={2} fill="url(#gV)" dot={false} />
+                      <Area type="monotone" dataKey="visitors" name="Visitors" stroke={ACCENT} strokeWidth={2} fill="url(#gV)" dot={false} />
                       <Area type="monotone" dataKey="pageViews" name="Page Views" stroke="#818cf8" strokeWidth={2} fill="url(#gP)" dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -533,7 +539,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                       <BarChart data={stats.hourlyTrend} margin={{ top: 0, right: 0, left: -28, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                         <XAxis dataKey="hour" tick={{ ...axisTick, fontSize: 9 }} tickLine={false} axisLine={false} />
-                        <YAxis                tick={{ ...axisTick, fontSize: 9 }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ ...axisTick, fontSize: 9 }} tickLine={false} axisLine={false} />
                         <Tooltip content={<CustomTooltip />} />
                         <Bar dataKey="count" name="Visits" fill={ACCENT} radius={[3, 3, 0, 0]} opacity={0.8} />
                       </BarChart>
@@ -564,7 +570,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                             <div className="flex items-center gap-1.5 w-28 shrink-0">
                               {d.device === "Mobile"
                                 ? <Smartphone size={11} color={pal(RED_COLORS, i)} />
-                                : <Monitor    size={11} color={pal(RED_COLORS, i)} />}
+                                : <Monitor size={11} color={pal(RED_COLORS, i)} />}
                               <span className="text-xs font-medium truncate" style={{ color: "#a1a1aa" }}>{d.device}</span>
                             </div>
                             <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>

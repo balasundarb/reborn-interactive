@@ -38,10 +38,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 };
 
     const socialLinks: { icon: typeof Twitter; href: string; label: string }[] = [
-        { icon: Twitter, href: '#', label: 'Twitter' },
-        { icon: Github, href: '#', label: 'GitHub' },
+        { icon: Twitter, href: 'https://x.com/RebornInte41311', label: 'Twitter' },
+        { icon: Github, href: 'https://github.com/reborninteractive36', label: 'GitHub' },
         { icon: Linkedin, href: '#', label: 'LinkedIn' },
-        { icon: Instagram, href: '#', label: 'Instagram' },
+        { icon: Instagram, href: 'https://www.instagram.com/reborninteractive_/', label: 'Instagram' },
     ];
 
     return (

@@ -8,7 +8,7 @@ interface SettingsState {
 }
 
 const initialState: SettingsState = {
-    theme: 'light',
+    theme: 'dark',
 }
 
 export const settingsSlice = createSlice({
