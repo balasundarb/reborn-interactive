@@ -2,6 +2,7 @@
 
 import Careers from "@/components/landingpage/Careers";
 import HeroSection from "@/components/landingpage/HeroSection";
+import ScrollVideo from "@/components/ui/scrollvideo";
 
 
 const HomePage = () => {
@@ -10,7 +11,8 @@ const HomePage = () => {
     <>
       <main className="overflow-x-hidden">
         <HeroSection />
-        <Careers />
+        <ScrollVideo /> 
+        {/* <Careers /> */}
       </main>
     </>
   );

@@ -17,7 +17,7 @@ const Careers: React.FC = () => {
         <ParallaxSection
           heading="Elevate Your Future"
           desc="Join a team of innovators and dreamers. We don't just build products; we build legacies. Explore our open roles today."
-          img="/assets/career_home.png"
+          img="/assets/motta_mandai.png"
           link="/news"
           imageLeft={true}
         />
@@ -77,7 +77,7 @@ const ParallaxSection: React.FC<ParallaxSectionProps> = ({
             className="absolute inset-0 bg-cover bg-center will-change-transform"
           />
           {/* Subtle vignette on the image */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+          {/* <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" /> */}
         </div>
 
         {/* CONTENT SIDE (45% Width) */}
@@ -122,7 +122,7 @@ const ParallaxSection: React.FC<ParallaxSectionProps> = ({
         </div>
 
         {/* Background Ambient Glow */}
-        <div className={`absolute top-1/2 -translate-y-1/2 ${imageLeft ? "right-0" : "left-0"} w-64 h-64 bg-red-600/10 blur-[100px] pointer-events-none rounded-full`} />
+        {/* <div className={`absolute top-1/2 -translate-y-1/2 ${imageLeft ? "right-0" : "left-0"} w-64 h-64 bg-red-600/10 blur-[100px] pointer-events-none rounded-full`} /> */}
       </div>
     </motion.div>
   );
