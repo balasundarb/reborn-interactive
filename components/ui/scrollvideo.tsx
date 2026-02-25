@@ -47,7 +47,7 @@ export default function UltraSmoothScrollVideo() {
         <div className="relative">
             <div ref={containerRef} className="h-[350vh] bg-black">
 
-                <div className="fixed z-0 inset-0 h-screen w-full overflow-hidden pointer-events-none">
+                <div className="fixed z-10 inset-0 h-screen w-full overflow-hidden pointer-events-none">
                     <video
                         ref={videoRef}
                         src="/video/video.webm"
@@ -66,11 +66,7 @@ export default function UltraSmoothScrollVideo() {
 
                 </div>
 
-                <div className="relative z-10 flex h-screen items-center justify-center">
-                    <h1 className="text-white text-5xl font-light tracking-widest uppercase">
-                        Refined Motion
-                    </h1>
-                </div>
+                 
             </div>
         </div>
     );

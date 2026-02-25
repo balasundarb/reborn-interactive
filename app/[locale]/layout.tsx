@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import PageLoader from '@/components/shared/PageLoader';
 
 type Props = {
     children: React.ReactNode;
@@ -18,5 +19,5 @@ export default async function LocaleLayout({ children, params }: Props) {
 
     setRequestLocale(locale);
     
-    return <>{children}</>;
+    return <> <PageLoader /> {children}</>;
 }

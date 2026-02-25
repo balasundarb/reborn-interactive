@@ -16,7 +16,7 @@ const bakeGlowSprite = (() => {
   return (radius: number): HTMLCanvasElement => {
     if (cache.has(radius)) return cache.get(radius)!;
     const size = Math.ceil(radius * 8);
-    const oc = document.createElement("canvas")!;
+    const oc = document!.createElement("canvas")!;
     oc.width = oc.height = size;
     const c = oc.getContext("2d")!;
     const cx = size / 2;
@@ -50,41 +50,21 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T 
   }) as T;
 }
 
-// ─── HUD Corner Component ─────────────────────────────────────────────────────
-const HUDCorner = React.memo(({ position, delay, children, loaded }: {
-  position: string;
-  delay: number;
-  children?: React.ReactNode;
-  loaded: boolean;
-}) => (
-  <div
-    className={`absolute ${position} transition-all duration-1000 ease-out`}
-    style={{
-      opacity: loaded ? 1 : 0,
-      transform: loaded ? 'translate3d(0,0,0)' : 'translate3d(0,20px,0)',
-      transitionDelay: `${delay}s`
-    }}
-  >
-    {children}
-  </div>
-));
-HUDCorner.displayName = 'HUDCorner';
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 const HeroSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const parallaxHudRef = useRef<HTMLDivElement>(null);
   const parallaxTitleRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLElement>(null);
 
-  const [loaded, setLoaded] = useState(false);
-  const [time, setTime] = useState("00:00:00");
+  const [videoReady, setVideoReady] = useState(false);
+  const [titleVisible, setTitleVisible] = useState(true);
   const [videoError, setVideoError] = useState(false);
+  const [time, setTime] = useState("00:00:00"); // kept for future use
 
   const sprites = useMemo(() => [1.1, 1.6, 2.1].map(bakeGlowSprite), []);
 
-  // Clock logic
+  // Clock logic (unused but kept)
   useEffect(() => {
     const tick = setInterval(() => {
       const n = new Date();
@@ -94,37 +74,33 @@ const HeroSection: React.FC = () => {
     return () => clearInterval(tick);
   }, []);
 
-  const handleVideoReady = useCallback(() => {
-    setLoaded(true);
+  // Title auto‑hide after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setTitleVisible(false), 3000);
+    return () => clearTimeout(timer);
   }, []);
 
+  const handleVideoReady = useCallback(() => setVideoReady(true), []);
   const handleVideoError = useCallback(() => {
     setVideoError(true);
-    setLoaded(true);
+    setVideoReady(true); // still mark ready to hide title
   }, []);
 
-  // Mouse parallax logic
+  // Mouse parallax for title
   useEffect(() => {
     const mouse = { x: 0, y: 0 };
-    const cur = { hx: 0, hy: 0, tx: 0, ty: 0 };
+    const cur = { tx: 0, ty: 0 };
     let raf: number;
 
     const onMove = (e: MouseEvent) => {
       mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
-
     window.addEventListener("mousemove", onMove, { passive: true });
 
     const loop = () => {
-      cur.hx += (mouse.x * 12 - cur.hx) * 0.05;
-      cur.hy += (mouse.y * 8 - cur.hy) * 0.05;
       cur.tx += (mouse.x * 24 - cur.tx) * 0.035;
       cur.ty += (mouse.y * 14 - cur.ty) * 0.035;
-
-      if (parallaxHudRef.current) {
-        parallaxHudRef.current.style.transform = `translate3d(${cur.hx.toFixed(2)}px,${cur.hy.toFixed(2)}px,0)`;
-      }
       if (parallaxTitleRef.current) {
         parallaxTitleRef.current.style.transform = `translate3d(${cur.tx.toFixed(2)}px,${cur.ty.toFixed(2)}px,0)`;
       }
@@ -137,7 +113,7 @@ const HeroSection: React.FC = () => {
     };
   }, []);
 
-  // Particle System logic
+  // Particle System
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -170,7 +146,10 @@ const HeroSection: React.FC = () => {
       requestAnimationFrame(draw);
     };
     const anim = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(anim);
+    return () => {
+      cancelAnimationFrame(anim);
+      window.removeEventListener("resize", setSize);
+    };
   }, [sprites]);
 
   return (
@@ -196,47 +175,36 @@ const HeroSection: React.FC = () => {
         }
         
         .mask-video {
-          mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+          mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
         }
       `}</style>
 
-      {/* ── Video Layer ── */}
+      {/* Video layer with bottom fade */}
       {!videoError && (
         <video
           ref={videoRef}
           autoPlay loop muted playsInline
+          preload="auto"
           onCanPlay={handleVideoReady}
           onError={handleVideoError}
-          className={`absolute z-10 inset-0 w-full h-full object-cover transition-opacity duration-1000 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute z-20 inset-0 w-full h-full object-cover transition-opacity duration-1000 mask-video ${!titleVisible && videoReady ? 'opacity-100' : 'opacity-0'
+            }`}
         >
           <source src="/video/Intro.webm" type="video/webm" />
         </video>
       )}
 
-      {/* ── Background Overlays ── */}
-      {/* <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.8)_60%)]" />
-      <canvas ref={canvasRef} className="absolute inset-0 z-20 pointer-events-none opacity-40" /> */}
+      {/* Background overlays */}
+      <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.8)_60%)]" />
+      <canvas ref={canvasRef} className="absolute inset-0 z-10 pointer-events-none opacity-40" />
 
-      {/* ── HUD Elements ── */}
-      <div ref={parallaxHudRef} className="absolute inset-0 z-30 pointer-events-none">
-        <HUDCorner position="top-10 left-10" delay={0.4} loaded={loaded}>
-          <div className="text-[#d63031] text-[10px] tracking-[0.4em] uppercase font-bold">System_Live // {time}</div>
-          <div className="w-32 h-[1px] bg-[#d63031]/40 mt-2 shadow-[0_0_8px_rgba(214,48,49,0.5)]" />
-        </HUDCorner>
-
-        <HUDCorner position="bottom-12 right-10" delay={0.6} loaded={loaded}>
-          <div className="text-white/20 text-[8px] tracking-[0.5em] text-right uppercase">Reborn_Interactive_Auth: OK</div>
-          <div className="text-white/10 text-[7px] tracking-[0.2em] text-right mt-1">31.2304° N / 121.4737° E</div>
-        </HUDCorner>
-      </div>
-
-      {/* ── Main Content (Headline) ── */}
-
+      {/* Main Content (Headline) */}
       <div ref={parallaxTitleRef} className="relative z-40 flex flex-col items-center pointer-events-none">
         <div
-          className={`transition-all duration-1000 ease-out transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
-          style={{ filter: loaded ? 'blur(0px)' : 'blur(10px)' }}
+          className={`transition-all duration-1000 ease-out transform ${titleVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+            }`}
+          style={{ filter: titleVisible ? 'blur(0px)' : 'blur(10px)' }}
         >
           <h1
             data-text="REBORN INTERACTIVE"
@@ -259,9 +227,8 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
 
-
-      {/* ── Bottom Smoothing Transition ── */}
-      <div className="absolute bottom-0 left-0 w-full h-40 z-50 bg-gradient-to-t from-[#020202] via-[#020202]/80 to-transparent pointer-events-none" />
+      {/* Bottom smoothing transition */}
+      <div className="fixed bottom-0 left-0 w-full h-40 z-50 bg-gradient-to-t from-[#020202] via-[#020202]/80 to-transparent pointer-events-none" />
     </section>
   );
 };

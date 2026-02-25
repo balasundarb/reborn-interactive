@@ -3,7 +3,6 @@ import { MyNavbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from '@/components/layout/scrollToTop';
 import { VisitorTracker } from '@/components/layout/visitTracker';
-import PageTransition from '@/components/shared/PageTransition';
 import NetflixRedTransition from '@/components/shared/NetflixRedTransition';
 
 type Props = {

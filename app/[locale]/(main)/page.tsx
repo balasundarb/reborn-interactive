@@ -12,7 +12,7 @@ const HomePage = () => {
       <main className="overflow-x-hidden">
         <HeroSection />
         <ScrollVideo /> 
-        {/* <Careers /> */}
+        <Careers />
       </main>
     </>
   );
