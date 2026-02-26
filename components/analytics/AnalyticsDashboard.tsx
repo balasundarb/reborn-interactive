@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
 import type { VisitorStats } from "@/types/visitor";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -52,7 +53,6 @@ interface CustomTooltipProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-// Dynamic values that can't be Tailwind classes
 const ACCENT = "#d63031";
 const ACCENT_DIM = "#b02020";
 const ACCENT_GLOW = "rgba(214,48,49,0.12)";
@@ -64,8 +64,8 @@ const GREEN_COLORS = ["#55efc4", "#00b894", "#00cec9", "#6c5ce7"];
 
 const TABS: TabType[] = ["overview", "pages", "geo"];
 
-const TEXT_MUTED = "#71717a"; // zinc-500
-const TEXT_FAINT = "#3f3f46"; // zinc-700
+const TEXT_MUTED = "#71717a";
+const TEXT_FAINT = "#3f3f46";
 const BORDER_DIM = "rgba(255,255,255,0.06)";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -87,6 +87,28 @@ function pal(arr: string[], i: number): string {
   return arr[i % arr.length] ?? arr[0] ?? ACCENT;
 }
 
+// ─── 3D Globe (dynamically imported — Three.js needs the browser) ─────────────
+// VisitorGlobe lives in ./VisitorGlobe.tsx
+
+interface VisitorGlobeProps {
+  locations: GroupedLocation[];
+}
+
+const VisitorGlobe = dynamic<VisitorGlobeProps>(
+  () => import("./VisitorMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="w-full h-full rounded-xl flex items-center justify-center"
+        style={{ background: "rgba(255,255,255,0.02)", color: TEXT_MUTED, fontSize: 12 }}
+      >
+        Initialising globe…
+      </div>
+    ),
+  }
+);
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor, live = false, delay = 0 }: StatCardProps) {
@@ -101,21 +123,15 @@ function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor, live = fal
       }}
     >
       <div className="flex items-start gap-3">
-        {/* Icon */}
         <div
           className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
           style={{ background: iconBg }}
         >
           <Icon size={16} color={iconColor} />
         </div>
-
-        {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-2">
-            <span
-              className="text-[10px] font-semibold uppercase tracking-widest"
-              style={{ color: TEXT_MUTED }}
-            >
+            <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: TEXT_MUTED }}>
               {label}
             </span>
             {live && (
@@ -132,10 +148,7 @@ function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor, live = fal
             {value}
           </div>
           {sub && (
-            <div
-              className="mt-1 text-[10px]"
-              style={{ color: TEXT_FAINT, fontFamily: "'JetBrains Mono', monospace" }}
-            >
+            <div className="mt-1 text-[10px]" style={{ color: TEXT_FAINT, fontFamily: "'JetBrains Mono', monospace" }}>
               {sub}
             </div>
           )}
@@ -159,10 +172,7 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 function CardTitle({ children, badge }: { children: React.ReactNode; badge?: string }) {
   return (
     <div className="flex items-center justify-between mb-5">
-      <span
-        className="text-[11px] font-bold uppercase tracking-widest"
-        style={{ color: TEXT_MUTED }}
-      >
+      <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: TEXT_MUTED }}>
         {children}
       </span>
       {badge && (
@@ -196,10 +206,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
       }}
     >
       {label !== undefined && (
-        <p
-          className="text-[10px] uppercase tracking-widest mb-1.5"
-          style={{ color: TEXT_MUTED }}
-        >
+        <p className="text-[10px] uppercase tracking-widest mb-1.5" style={{ color: TEXT_MUTED }}>
           {String(label)}
         </p>
       )}
@@ -222,19 +229,14 @@ function EmptyState({ icon: Icon, text = "No data yet" }: { icon?: LucideIcon; t
   );
 }
 
-function BarRow({
-  label, count, max, color = ACCENT,
-}: { label: string; count: number; max: number; color?: string }) {
+function BarRow({ label, count, max, color = ACCENT }: { label: string; count: number; max: number; color?: string }) {
   const pct = max > 0 ? Math.round((count / max) * 100) : 0;
   return (
     <div
       className="flex items-center gap-3 py-1.5 border-b last:border-b-0"
       style={{ borderColor: TEXT_FAINT + "40" }}
     >
-      <span
-        className="w-28 shrink-0 text-xs font-medium truncate"
-        style={{ color: "#a1a1aa" }}
-      >
+      <span className="w-28 shrink-0 text-xs font-medium truncate" style={{ color: "#a1a1aa" }}>
         {label}
       </span>
       <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -301,20 +303,19 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
     : (user.email?.[0]?.toUpperCase() ?? "A");
 
   const handleSignOut = async (): Promise<void> => {
-    await authClient.signOut(
-      { fetchOptions: { onSuccess: () => router.push("/login"), onError: (err: any) => { toast.error(`Sign out error: ${err.message || err}`) } } }
-    );
-
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => router.push("/login"),
+        onError: (err: any) => { toast.error(`Sign out error: ${err.message || err}`); },
+      },
+    });
   };
 
   const refMax = stats?.referrers[0]?.count ?? 1;
-
-  // Axis tick style shared across all charts
   const axisTick = { fontSize: 10, fill: TEXT_MUTED, fontFamily: "JetBrains Mono" };
 
   return (
     <>
-      {/* Keyframes — only what Tailwind can't do */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
         @keyframes fadeup {
@@ -333,9 +334,25 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinning svg { animation: spin 0.8s linear infinite; }
         .fade-in { animation: fadeup 0.35s ease both; }
+
+        /* Override Leaflet default popup/tooltip styles for dark theme */
+        .leaflet-tooltip {
+          background: #fff !important;
+          border: 1px solid #e5e7eb !important;
+          border-radius: 8px !important;
+          padding: 6px 10px !important;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.35) !important;
+          font-family: 'JetBrains Mono', monospace !important;
+        }
+        .leaflet-tooltip-top::before {
+          border-top-color: #e5e7eb !important;
+        }
+        /* Dark map container */
+        .leaflet-container {
+          background: #0d1117 !important;
+        }
       `}</style>
 
-      {/* ── Root ── */}
       <div
         className="min-h-screen overflow-x-hidden relative"
         style={{ background: "#0a0a0b", fontFamily: "'Outfit', sans-serif", color: "#f4f4f5" }}
@@ -361,13 +378,8 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
         {/* ── Topbar ── */}
         <header
           className="sticky top-0 z-40 flex items-center justify-between px-7 h-14 border-b"
-          style={{
-            background: "rgba(10,10,11,0.9)",
-            backdropFilter: "blur(20px)",
-            borderColor: BORDER_DIM,
-          }}
+          style={{ background: "rgba(10,10,11,0.9)", backdropFilter: "blur(20px)", borderColor: BORDER_DIM }}
         >
-          {/* Logo */}
           <div className="flex items-center gap-2.5 text-[13px] font-bold uppercase tracking-widest" style={{ color: "#f4f4f5" }}>
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -378,9 +390,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
             Adminpanel
           </div>
 
-          {/* Right side */}
           <div className="flex items-center gap-3">
-            {/* Refresh */}
             <button
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 ${loading ? "spinning" : ""}`}
               style={{ borderColor: BORDER_DIM, color: TEXT_MUTED, background: "transparent" }}
@@ -398,7 +408,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
               Refresh
             </button>
 
-            {/* User */}
             <div className="flex items-center gap-2">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
@@ -411,7 +420,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
               </span>
             </div>
 
-            {/* Sign out */}
             <button
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200"
               style={{ borderColor: `${ACCENT}30`, color: `${ACCENT}aa`, background: "transparent" }}
@@ -499,8 +507,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
           {/* ══════════════ OVERVIEW ══════════════ */}
           {activeTab === "overview" && (
             <div className="fade-in space-y-3.5">
-
-              {/* Daily growth — full width */}
               <Card>
                 <CardTitle badge="30 days">Daily Visitors & Page Views</CardTitle>
                 {stats?.dailyGrowth?.length ? (
@@ -528,10 +534,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                 ) : <EmptyState icon={BarChart2} text="No data in the last 30 days" />}
               </Card>
 
-              {/* Hourly | Devices | Browsers */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-
-                {/* Hourly */}
                 <Card>
                   <CardTitle badge="24h">Hourly Trend</CardTitle>
                   {stats?.hourlyTrend?.length ? (
@@ -547,7 +550,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                   ) : <EmptyState icon={Activity} />}
                 </Card>
 
-                {/* Devices */}
                 <Card>
                   <CardTitle>Devices</CardTitle>
                   {stats?.devices?.length ? (
@@ -562,11 +564,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                       </ResponsiveContainer>
                       <div className="mt-3 space-y-0">
                         {stats.devices.map((d, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center gap-3 py-1.5 border-b last:border-b-0"
-                            style={{ borderColor: TEXT_FAINT + "40" }}
-                          >
+                          <div key={i} className="flex items-center gap-3 py-1.5 border-b last:border-b-0" style={{ borderColor: TEXT_FAINT + "40" }}>
                             <div className="flex items-center gap-1.5 w-28 shrink-0">
                               {d.device === "Mobile"
                                 ? <Smartphone size={11} color={pal(RED_COLORS, i)} />
@@ -584,7 +582,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                   ) : <EmptyState icon={Monitor} />}
                 </Card>
 
-                {/* Browsers */}
                 <Card>
                   <CardTitle>Browsers</CardTitle>
                   {stats?.browsers?.length ? (
@@ -607,7 +604,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                 </Card>
               </div>
 
-              {/* OS | Referrers */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <Card>
                   <CardTitle>Operating Systems</CardTitle>
@@ -683,9 +679,45 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
           {/* ══════════════ GEO ══════════════ */}
           {activeTab === "geo" && (
             <div className="fade-in space-y-3.5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
 
-                {/* Countries */}
+              {/* ── Leaflet Map ── */}
+              <Card className="p-0 overflow-hidden">
+                {/* Header sits above the map */}
+                <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: TEXT_MUTED }}>
+                    Visitor Locations
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-[10px] font-medium px-2 py-0.5 rounded-full border"
+                      style={{ color: TEXT_MUTED, borderColor: BORDER_DIM, background: "rgba(255,255,255,0.03)", fontFamily: "'JetBrains Mono', monospace" }}
+                    >
+                      {groupedLocations.length} spots
+                    </span>
+                    {/* Legend dots */}
+                    <div className="flex items-center gap-1.5 text-[10px]" style={{ color: TEXT_MUTED, fontFamily: "'JetBrains Mono', monospace" }}>
+                      <span
+                        className="inline-block w-2.5 h-2.5 rounded-full"
+                        style={{ background: ACCENT, boxShadow: `0 0 6px ${ACCENT}` }}
+                      />
+                      <span>= visitor cluster</span>
+                    </div>
+                  </div>
+                </div>
+
+                {groupedLocations.length > 0 ? (
+                  <div style={{ height: 520 }}>
+                    <VisitorGlobe locations={groupedLocations} />
+                  </div>
+                ) : (
+                  <div className="px-6 pb-6">
+                    <EmptyState icon={Globe} text="No location data yet" />
+                  </div>
+                )}
+              </Card>
+
+              {/* Countries + Regions side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <Card>
                   <CardTitle badge="30 days">Top Countries</CardTitle>
                   {stats?.topCountries?.length ? (
@@ -704,7 +736,6 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                   ) : <EmptyState icon={Globe} text="No location data yet" />}
                 </Card>
 
-                {/* Regions */}
                 <Card>
                   <CardTitle badge="30 days">Top Regions</CardTitle>
                   {stats?.topRegions?.length ? (
@@ -724,10 +755,10 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
                 </Card>
               </div>
 
-              {/* Location tags */}
+              {/* Location tag cloud */}
               {groupedLocations.length > 0 && (
                 <Card>
-                  <CardTitle badge={`${groupedLocations.length} spots`}>Visitor Locations</CardTitle>
+                  <CardTitle badge={`${groupedLocations.length} spots`}>All Locations</CardTitle>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {[...groupedLocations]
                       .sort((a, b) => b.count - a.count)
