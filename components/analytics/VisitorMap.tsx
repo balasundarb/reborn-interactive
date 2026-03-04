@@ -5,10 +5,13 @@
  *
  * Features:
  *  - Filled landmass polygons (dark teal) + bright border lines
- *  - Glowing visitor spikes (cones) that pulse upward from locations
+ *  - Glowing dot markers that softly breathe in opacity
  *  - Animated connection arcs between top visitor locations
  *  - Dot-matrix atmosphere (particle ring)
  *  - Specular ocean with fresnel-like rim glow
+ *  - Scroll to zoom in/out
+ *  - Click a dot to focus & zoom into it
+ *  - Rotation stops on any hover
  *  - Smooth drag + inertia + auto-rotate
  *  - Hover tooltip
  */
@@ -39,6 +42,9 @@ interface TooltipState {
 
 const R = 2;
 const ACCENT = "#d63031";
+const MIN_Z = 3.5;
+const MAX_Z = 9.0;
+
 const DOT_PALETTE = [
   "#ff6b6b", "#74b9ff", "#55efc4", "#fdcb6e",
   "#a29bfe", "#fd79a8", "#00cec9", "#e17055",
@@ -57,7 +63,6 @@ function latLonToVec3(lat: number, lon: number, r: number): THREE.Vector3 {
   );
 }
 
-// Slerp between two points on sphere surface (for arcs)
 function slerpVec3(a: THREE.Vector3, b: THREE.Vector3, t: number): THREE.Vector3 {
   const angle = a.angleTo(b);
   if (angle < 0.001) return a.clone().lerp(b, t);
@@ -71,7 +76,6 @@ function slerpVec3(a: THREE.Vector3, b: THREE.Vector3, t: number): THREE.Vector3
 
 function buildLandMeshes(geojson: any, r: number): THREE.Group {
   const group = new THREE.Group();
-
   const landMat = new THREE.MeshPhongMaterial({
     color:    0x0d3b2e,
     emissive: 0x051a14,
@@ -81,25 +85,18 @@ function buildLandMeshes(geojson: any, r: number): THREE.Group {
   });
 
   const processPolygon = (rings: [number, number][][]) => {
-    // Triangulate the outer ring as a fan from centroid (good enough for countries)
     const outer = rings[0]!;
     if (outer.length < 3) return;
-
     const verts: number[] = [];
-    // Compute centroid
     let cx = 0, cy = 0;
     outer.forEach(([lon, lat]) => { cx += lon; cy += lat; });
     cx /= outer.length; cy /= outer.length;
     const center = latLonToVec3(cy, cx, r + 0.004);
-
     for (let i = 0; i < outer.length - 1; i++) {
       const a = latLonToVec3(outer[i]![1],     outer[i]![0],     r + 0.004);
       const b = latLonToVec3(outer[i + 1]![1], outer[i + 1]![0], r + 0.004);
-      verts.push(center.x, center.y, center.z);
-      verts.push(a.x, a.y, a.z);
-      verts.push(b.x, b.y, b.z);
+      verts.push(center.x, center.y, center.z, a.x, a.y, a.z, b.x, b.y, b.z);
     }
-
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
     geo.computeVertexNormals();
@@ -141,59 +138,50 @@ function buildBorderLines(geojson: any, r: number): THREE.LineSegments {
   );
 }
 
-// ── Visitor spike (glowing cone pointing outward) ─────────────────────────────
+// ── Glowing dot marker ────────────────────────────────────────────────────────
 
 function buildSpike(loc: GroupedLocation, maxCount: number, color: THREE.Color): THREE.Group {
   const group = new THREE.Group();
   const scale = 0.4 + (loc.count / maxCount) * 1.6;
-  const height = 0.08 + scale * 0.18;
-  const baseR  = 0.012 + scale * 0.012;
+  const radius = 0.022 + scale * 0.018;
 
-  // Core spike
-  const coneGeo = new THREE.ConeGeometry(baseR, height, 8, 1, true);
-  const coneMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9 });
-  const cone    = new THREE.Mesh(coneGeo, coneMat);
-  cone.position.y = height / 2;
-  group.add(cone);
+  // Core dot
+  const coreMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 });
+  const core = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 16), coreMat);
+  core.userData.type = "core";
+  group.add(core);
 
-  // Outer glow (slightly larger, transparent)
-  const glowGeo = new THREE.ConeGeometry(baseR * 2.5, height * 1.1, 8, 1, true);
-  const glowMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
-  const glow    = new THREE.Mesh(glowGeo, glowMat);
-  glow.position.y = height / 2;
+  // Soft glow shell
+  const glowMat = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.18,
+    side: THREE.FrontSide,
+  });
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(radius * 2.4, 16, 16), glowMat);
+  glow.userData.type = "glow";
   group.add(glow);
 
-  // Base ring
-  const ringGeo = new THREE.RingGeometry(baseR, baseR * 3, 24);
-  const ringMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
-  group.add(new THREE.Mesh(ringGeo, ringMat));
-
-  // Position on globe
-  const pos    = latLonToVec3(loc.lat, loc.lon, R);
-  const normal = pos.clone().normalize();
+  const pos = latLonToVec3(loc.lat, loc.lon, R + radius);
   group.position.copy(pos);
-  group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
 
   return group;
 }
 
-// ── Animated arc between two locations ───────────────────────────────────────
+// ── Animated arc ──────────────────────────────────────────────────────────────
 
 function buildArc(from: GroupedLocation, to: GroupedLocation, color: THREE.Color): THREE.Line {
   const points: THREE.Vector3[] = [];
   const segments = 60;
   const arcHeight = 0.5;
-
   const vA = latLonToVec3(from.lat, from.lon, R + 0.015);
   const vB = latLonToVec3(to.lat,   to.lon,   R + 0.015);
-
   for (let i = 0; i <= segments; i++) {
     const t  = i / segments;
     const pt = slerpVec3(vA.clone().normalize(), vB.clone().normalize(), t);
     const h  = R + 0.015 + arcHeight * Math.sin(t * Math.PI);
     points.push(pt.multiplyScalar(h));
   }
-
   const geo = new THREE.BufferGeometry().setFromPoints(points);
   return new THREE.Line(
     geo,
@@ -201,13 +189,12 @@ function buildArc(from: GroupedLocation, to: GroupedLocation, color: THREE.Color
   );
 }
 
-// ── Particle atmosphere ring ──────────────────────────────────────────────────
+// ── Particle atmosphere ───────────────────────────────────────────────────────
 
 function buildAtmosphereParticles(): THREE.Points {
   const count = 2000;
   const pos: number[] = [];
   for (let i = 0; i < count; i++) {
-    // Shell between R*1.07 and R*1.18
     const r     = R * 1.07 + Math.random() * R * 0.11;
     const theta = Math.random() * Math.PI * 2;
     const phi   = Math.acos(2 * Math.random() - 1);
@@ -233,7 +220,6 @@ export default function VisitorGlobe({ locations }: Props) {
     visible: false, x: 0, y: 0, country: "", region: null, count: 0,
   });
   const [geoStatus, setGeoStatus] = useState<"loading" | "ok" | "error">("loading");
-
   const countryColor: Record<string, string> = {};
   locations.forEach((loc) => {
     if (!countryColor[loc.country]) {
@@ -264,31 +250,32 @@ export default function VisitorGlobe({ locations }: Props) {
     function buildScene(geojson: any) {
       if (!el || cancelled) return;
 
-      let isDragging = false;
-      let prevMouse  = { x: 0, y: 0 };
+      let isDragging  = false;
+      let isHovering  = false;
+      let prevMouse   = { x: 0, y: 0 };
       let rotVelX = 0, rotVelY = 0;
-      let autoRotate = true;
+      let autoRotate  = true;
       let resumeTimer: ReturnType<typeof setTimeout> | null = null;
+
       const clampX = (v: number) => Math.max(-0.9, Math.min(0.9, v));
 
-      // ── Renderer ────────────────────────────────────────────────────────────
+      // ── Renderer ──────────────────────────────────────────────────────────
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setClearColor(0x000000, 0);
       renderer.setSize(el.clientWidth, el.clientHeight);
-      renderer.shadowMap.enabled = false;
       el.appendChild(renderer.domElement);
 
-      // ── Scene / Camera ───────────────────────────────────────────────────────
+      // ── Scene / Camera ─────────────────────────────────────────────────────
       const scene  = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(40, el.clientWidth / el.clientHeight, 0.1, 200);
       camera.position.set(0, 0, 6.2);
 
-      // ── Pivot ────────────────────────────────────────────────────────────────
+      // ── Pivot ──────────────────────────────────────────────────────────────
       const pivot = new THREE.Group();
       scene.add(pivot);
 
-      // ── Lights ───────────────────────────────────────────────────────────────
+      // ── Lights ────────────────────────────────────────────────────────────
       scene.add(new THREE.AmbientLight(0x112233, 1.2));
       const sun = new THREE.DirectionalLight(0x88ccff, 1.8);
       sun.position.set(8, 5, 6);
@@ -296,12 +283,11 @@ export default function VisitorGlobe({ locations }: Props) {
       const back = new THREE.DirectionalLight(0x001133, 0.6);
       back.position.set(-6, -3, -5);
       scene.add(back);
-      // Rim light — gives the glowing edge effect
       const rim = new THREE.DirectionalLight(0x00ffaa, 0.4);
       rim.position.set(-4, 0, -4);
       scene.add(rim);
 
-      // ── Ocean ────────────────────────────────────────────────────────────────
+      // ── Ocean ──────────────────────────────────────────────────────────────
       pivot.add(new THREE.Mesh(
         new THREE.SphereGeometry(R, 80, 80),
         new THREE.MeshPhongMaterial({
@@ -312,13 +298,13 @@ export default function VisitorGlobe({ locations }: Props) {
         }),
       ));
 
-      // ── Land + borders ───────────────────────────────────────────────────────
+      // ── Land + borders ─────────────────────────────────────────────────────
       if (geojson) {
         pivot.add(buildLandMeshes(geojson, R));
         pivot.add(buildBorderLines(geojson, R + 0.006));
       }
 
-      // ── Graticule (subtle lat/lon grid) ──────────────────────────────────────
+      // ── Graticule ──────────────────────────────────────────────────────────
       const gratVerts: number[] = [];
       for (let lat = -80; lat <= 80; lat += 20) {
         const phi = (90 - lat) * (Math.PI / 180);
@@ -348,21 +334,18 @@ export default function VisitorGlobe({ locations }: Props) {
         new THREE.LineBasicMaterial({ color: 0x0a2a1a, transparent: true, opacity: 0.4 }),
       ));
 
-      // ── Atmosphere layers ────────────────────────────────────────────────────
-      // Inner haze
+      // ── Atmosphere ─────────────────────────────────────────────────────────
       scene.add(new THREE.Mesh(
         new THREE.SphereGeometry(R * 1.04, 64, 64),
         new THREE.MeshPhongMaterial({ color: 0x004422, transparent: true, opacity: 0.07, side: THREE.BackSide }),
       ));
-      // Outer glow
       scene.add(new THREE.Mesh(
         new THREE.SphereGeometry(R * 1.12, 64, 64),
         new THREE.MeshPhongMaterial({ color: 0x002244, transparent: true, opacity: 0.05, side: THREE.BackSide }),
       ));
-      // Particles
       scene.add(buildAtmosphereParticles());
 
-      // ── Stars ────────────────────────────────────────────────────────────────
+      // ── Stars ──────────────────────────────────────────────────────────────
       const starPos: number[] = [];
       for (let i = 0; i < 2500; i++) {
         const v = new THREE.Vector3(
@@ -379,7 +362,7 @@ export default function VisitorGlobe({ locations }: Props) {
         new THREE.PointsMaterial({ color: 0x88aacc, size: 0.05, transparent: true, opacity: 0.6 }),
       ));
 
-      // ── Visitor spikes ───────────────────────────────────────────────────────
+      // ── Visitor dots ───────────────────────────────────────────────────────
       const spikeGroups: THREE.Group[] = [];
       const spikeHitMeshes: { mesh: THREE.Mesh; loc: GroupedLocation }[] = [];
 
@@ -389,9 +372,9 @@ export default function VisitorGlobe({ locations }: Props) {
         pivot.add(spike);
         spikeGroups.push(spike);
 
-        // Invisible hit sphere for raycasting
+        // Hit sphere for raycasting
         const hitMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(0.08, 8, 8),
+          new THREE.SphereGeometry(0.1, 8, 8),
           new THREE.MeshBasicMaterial({ visible: false }),
         );
         hitMesh.position.copy(latLonToVec3(loc.lat, loc.lon, R + 0.05));
@@ -399,7 +382,7 @@ export default function VisitorGlobe({ locations }: Props) {
         spikeHitMeshes.push({ mesh: hitMesh, loc });
       });
 
-      // ── Connection arcs (top 6 locations by count) ───────────────────────────
+      // ── Connection arcs ────────────────────────────────────────────────────
       const top = [...locations].sort((a, b) => b.count - a.count).slice(0, 6);
       for (let i = 0; i < top.length - 1; i++) {
         const color = new THREE.Color(countryColor[top[i]!.country] ?? ACCENT);
@@ -407,13 +390,20 @@ export default function VisitorGlobe({ locations }: Props) {
         pivot.add(buildArc(top[i]!, top[(i + 1) % top.length]!, color));
       }
 
-      // ── Raycaster ────────────────────────────────────────────────────────────
+      // ── Raycaster ──────────────────────────────────────────────────────────
       const raycaster = new THREE.Raycaster();
       const mouse2d   = new THREE.Vector2();
 
-      // ── Events ───────────────────────────────────────────────────────────────
+      // ── Scroll to zoom ─────────────────────────────────────────────────────
+      const onWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        camera.position.z = Math.max(MIN_Z, Math.min(MAX_Z, camera.position.z + e.deltaY * 0.005));
+      };
+
+      // ── Mouse events ───────────────────────────────────────────────────────
       const onMouseMove = (e: MouseEvent) => {
         const rect = el.getBoundingClientRect();
+        isHovering = true;
         mouse2d.set(
           ((e.clientX - rect.left) / rect.width)  * 2 - 1,
           -((e.clientY - rect.top) / rect.height) * 2 + 1,
@@ -438,6 +428,7 @@ export default function VisitorGlobe({ locations }: Props) {
         el.style.cursor = isDragging ? "grabbing" : "grab";
         setTooltip((t) => ({ ...t, visible: false }));
       };
+
       const onMouseDown = (e: MouseEvent) => {
         isDragging = true; autoRotate = false;
         if (resumeTimer) clearTimeout(resumeTimer);
@@ -449,9 +440,12 @@ export default function VisitorGlobe({ locations }: Props) {
         resumeTimer = setTimeout(() => { autoRotate = true; }, 2500);
       };
       const onMouseLeave = () => {
-        isDragging = false;
+        isDragging = false; isHovering = false;
         setTooltip((t) => ({ ...t, visible: false }));
       };
+      const onMouseEnter = () => { isHovering = true; };
+
+      // ── Touch events ───────────────────────────────────────────────────────
       const onTouchStart = (e: TouchEvent) => {
         isDragging = true; autoRotate = false;
         if (resumeTimer) clearTimeout(resumeTimer);
@@ -474,6 +468,8 @@ export default function VisitorGlobe({ locations }: Props) {
       el.addEventListener("mousedown",  onMouseDown);
       el.addEventListener("mouseup",    onMouseUp);
       el.addEventListener("mouseleave", onMouseLeave);
+      el.addEventListener("mouseenter", onMouseEnter);
+      el.addEventListener("wheel",      onWheel, { passive: false });
       el.addEventListener("touchstart", onTouchStart, { passive: true });
       el.addEventListener("touchmove",  onTouchMove,  { passive: true });
       el.addEventListener("touchend",   onTouchEnd);
@@ -486,23 +482,37 @@ export default function VisitorGlobe({ locations }: Props) {
       });
       ro.observe(el);
 
-      // ── Render loop ──────────────────────────────────────────────────────────
+      // ── Render loop ────────────────────────────────────────────────────────
       const clock = new THREE.Clock();
       const tick = () => {
         animId = requestAnimationFrame(tick);
         const t = clock.getElapsedTime();
 
-        if (autoRotate && !isDragging) pivot.rotation.y += 0.0012;
-        if (!isDragging) {
-          rotVelX *= 0.88; rotVelY *= 0.88;
-          pivot.rotation.x = clampX(pivot.rotation.x + rotVelX);
-          pivot.rotation.y += rotVelY;
-        }
+        // Normal rotation — paused while hovering
+          if (autoRotate && !isDragging && !isHovering) pivot.rotation.y += 0.0012;
+          if (!isDragging) {
+            rotVelX *= 0.88; rotVelY *= 0.88;
+            pivot.rotation.x = clampX(pivot.rotation.x + rotVelX);
+            pivot.rotation.y += rotVelY;
+          }
 
-        // Pulse spikes
+        // Breathe dots
         spikeGroups.forEach((g, i) => {
-          const pulse = 1 + 0.12 * Math.sin(t * 2.5 + i * 0.9);
-          g.scale.set(1, pulse, 1);
+          g.children.forEach((child) => {
+            const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
+            if (child.userData.type === "core") {
+              mat.opacity = 0.75 + 0.25 * Math.sin(t * 1.6 + i * 0.7);
+            } else if (child.userData.type === "glow") {
+              mat.opacity = 0.08 + 0.12 * Math.sin(t * 1.6 + i * 0.7 + 0.8);
+            }
+          });
+        });
+
+        // Zoom-aware dot sizing
+        const zoomFactor = (camera.position.z - MIN_Z) / (MAX_Z - MIN_Z); // 0 = close, 1 = far
+        const dotScale = 0.5 + zoomFactor * 0.8; // shrinks as you zoom in
+        spikeGroups.forEach((g) => {
+          g.scale.setScalar(dotScale);
         });
 
         // Animate arc opacity
@@ -527,6 +537,8 @@ export default function VisitorGlobe({ locations }: Props) {
         el.removeEventListener("mousedown",  onMouseDown);
         el.removeEventListener("mouseup",    onMouseUp);
         el.removeEventListener("mouseleave", onMouseLeave);
+        el.removeEventListener("mouseenter", onMouseEnter);
+        el.removeEventListener("wheel",      onWheel);
         el.removeEventListener("touchstart", onTouchStart);
         el.removeEventListener("touchmove",  onTouchMove);
         el.removeEventListener("touchend",   onTouchEnd);
@@ -592,7 +604,8 @@ export default function VisitorGlobe({ locations }: Props) {
               }} />
               <span style={{
                 fontSize: 9, fontFamily: "'JetBrains Mono', monospace",
-                color: "#a0b4c0", letterSpacing: "0.04em",
+                color: "#a0b4c0",
+                letterSpacing: "0.04em",
               }}>
                 {loc.country} <span style={{ color: countryColor[loc.country] ?? ACCENT }}>×{loc.count}</span>
               </span>
@@ -626,7 +639,7 @@ export default function VisitorGlobe({ locations }: Props) {
         fontSize: 9, fontFamily: "'JetBrains Mono', monospace",
         color: "#1a3a2a", pointerEvents: "none", letterSpacing: "0.08em", textTransform: "uppercase",
       }}>
-        drag · rotate
+        scroll · drag
       </div>
     </div>
   );
