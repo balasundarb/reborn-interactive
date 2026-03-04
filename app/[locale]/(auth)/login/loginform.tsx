@@ -165,7 +165,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             onSocialLogin('google');
                         } else {
                             const { authClient } = await import('@/lib/auth-client');
-                            await authClient.signIn.social({ provider: 'google' });
+                            await authClient.signIn.social({ provider: 'google' , callbackURL: "/adminpanel"});
                         }
                     }}
                     icon={<FaGoogle size={20} />}
@@ -176,7 +176,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             onSocialLogin('github');
                         } else {
                             const { authClient } = await import('@/lib/auth-client');
-                            await authClient.signIn.social({ provider: 'github' });
+                            await authClient.signIn.social({ provider: 'github', callbackURL: "/adminpanel" });
                         }
                     }}
                     icon={<Github size={20} />}
