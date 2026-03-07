@@ -17,7 +17,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner"; 
-import Header from "./Header";
+import Header from "../Header";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -379,14 +379,13 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
  
 <Header />
         {/* ── Body ── */}
-        <main className="relative z-10 max-w-screen-xl mx-auto px-7 pt-9 pb-20">
+        <main className="relative z-10 max-w-screen-xl mx-auto px-7 pt-9 pb-20 mt-30">
 
           {/* Heading */}
           <div className="mb-9" style={{ animation: "fadeup 0.5s ease both" }}>
-            <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "#f4f4f5", letterSpacing: "-0.03em" }}>
-              Visitor{" "}
-              <em className="not-italic font-black" style={{ color: ACCENT }}>Analytics</em>
-            </h1>
+           <h1 className="text-4xl font-extrabold text-white tracking-tight italic">
+            VISITOR <span className="text-[#d63031]">ANALYTICS</span>
+          </h1>
             <p
               className="mt-2 text-xs flex items-center gap-2"
               style={{ color: TEXT_MUTED, fontFamily: "'JetBrains Mono', monospace" }}
@@ -398,7 +397,7 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
           </div>
 
           {/* ── Stat cards ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3 mb-7">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
             <StatCard icon={Activity} label="Active Now" value={stats?.activeNow ?? 0} iconBg="rgba(74,222,128,0.12)" iconColor="#4ade80" live delay={0} />
             <StatCard icon={Eye} label="Today" value={formatNumber(stats?.today ?? 0)} iconBg="rgba(56,189,248,0.12)" iconColor="#38bdf8" delay={50} />
             <StatCard icon={TrendingUp} label="This Week" value={formatNumber(stats?.week ?? 0)} iconBg="rgba(129,140,248,0.12)" iconColor="#818cf8" delay={100} />

@@ -4,9 +4,10 @@ import React, { useState, useTransition, useCallback } from "react";
 import {
   Users, UserPlus, Trash2, KeyRound, Search,
   Loader2, X, Eye, EyeOff, ShieldAlert, CheckCircle2,
-  Mail, User, Lock, AlertTriangle, RefreshCw,
+  Mail, User, Lock, AlertTriangle, RefreshCw, ShieldCheck, ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
+import Header from "@/components/adminpanel/Header";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface UserRecord {
@@ -17,7 +18,7 @@ export interface UserRecord {
   role?: string;
 }
 
-type ModalMode = "add" | "password" | "delete" | null;
+type ModalMode = "add" | "password" | "delete" | "role" | null;
 
 interface Props {
   currentUserId: string;
@@ -26,8 +27,9 @@ interface Props {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function Avatar({ name }: { name: string }) {
-  const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-  const hue = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+  const safeName = name ?? "?";
+  const initials = safeName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+  const hue = safeName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
   return (
     <div
       className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold text-white shrink-0"
@@ -315,6 +317,86 @@ function DeleteModal({
   );
 }
 
+
+// ─── Set Role Modal ───────────────────────────────────────────────────────────
+function SetRoleModal({ user, onClose, onSuccess }: { user: UserRecord; onClose: () => void; onSuccess: (id: string, role: string) => void }) {
+  const isAdmin = user.role === "admin";
+  const [isPending, startTransition] = useTransition();
+
+  const handleToggle = () => {
+    const newRole = isAdmin ? "user" : "admin";
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/admin/users/set-role", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user.id, role: newRole }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to update role");
+        toast.success(`${user.name ?? "User"} is now ${newRole === "admin" ? "an Admin" : "a regular User"}`);
+        onSuccess(user.id, newRole);
+        onClose();
+      } catch (e: any) {
+        toast.error(e.message);
+      }
+    });
+  };
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="p-8 space-y-6 text-center">
+        <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center border ${
+          isAdmin
+            ? "bg-amber-500/10 border-amber-500/25"
+            : "bg-[#d63031]/10 border-[#d63031]/25"
+        }`}>
+          {isAdmin
+            ? <ShieldOff className="text-amber-400" size={24} />
+            : <ShieldCheck className="text-[#d63031]" size={24} />
+          }
+        </div>
+        <div>
+          <h3 className="text-2xl font-extrabold text-white tracking-tight italic">
+            {isAdmin ? "REVOKE " : "GRANT "}
+            <span className="text-[#d63031]">ADMIN</span>
+          </h3>
+          <p className="text-slate-400 text-sm mt-2 leading-relaxed">
+            {isAdmin
+              ? <>Remove admin privileges from <span className="text-white font-semibold">{user.name ?? user.email}</span>? They will become a regular user.</>
+              : <>Grant admin privileges to <span className="text-white font-semibold">{user.name ?? user.email}</span>? They will have full admin access.</>
+            }
+          </p>
+        </div>
+        <div className="flex gap-3 pt-1">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3.5 bg-white/5 border border-white/10 rounded-xl text-slate-300 font-semibold hover:bg-white/10 transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleToggle}
+            disabled={isPending}
+            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white ${
+              isAdmin
+                ? "bg-amber-600 hover:bg-amber-700"
+                : "bg-[#d63031] hover:bg-[#b02828]"
+            }`}
+          >
+            {isPending
+              ? <Loader2 className="animate-spin" size={18} />
+              : isAdmin
+                ? <><ShieldOff size={17} /> Revoke Admin</>
+                : <><ShieldCheck size={17} /> Make Admin</>
+            }
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function UserManagement({ currentUserId, initialUsers }: Props) {
   const [users, setUsers] = useState<UserRecord[]>(initialUsers);
@@ -344,26 +426,23 @@ export function UserManagement({ currentUserId, initialUsers }: Props) {
   // Optimistic updates
   const handleAdded = (user: UserRecord) => setUsers((prev) => [user, ...prev]);
   const handleDeleted = (id: string) => setUsers((prev) => prev.filter((u) => u.id !== id));
+  const handleRoleUpdated = (id: string, role: string) => setUsers((prev) => prev.map((u) => u.id === id ? { ...u, role } : u));
 
-  const filtered = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = users.filter((u) => {
+    const name = (u.name ?? "").toLowerCase();
+    const email = (u.email ?? "").toLowerCase();
+    const q = search.toLowerCase();
+    return name.includes(q) || email.includes(q);
+  });
 
   return (
-    <div className="min-h-screen bg-[#060b14] p-6 md:p-10">
+    <div className="min-h-screen bg-[#060b14] mt-20">
+      <Header />
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-24 md:pt-28 pb-16">
       {/* ── Header ── */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-[#d63031]/15 border border-[#d63031]/25 flex items-center justify-center">
-              <ShieldAlert className="text-[#d63031]" size={14} />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
-              Admin Panel
-            </span>
-          </div>
+    
           <h1 className="text-4xl font-extrabold text-white tracking-tight italic">
             USER <span className="text-[#d63031]">MANAGEMENT</span>
           </h1>
@@ -442,6 +521,11 @@ export function UserManagement({ currentUserId, initialUsers }: Props) {
                         YOU
                       </span>
                     )}
+                    {user.role === "admin" && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-400 border border-amber-500/25 shrink-0 flex items-center gap-0.5">
+                        <ShieldCheck size={10} /> ADMIN
+                      </span>
+                    )}
                   </div>
                   <p className="text-slate-500 text-xs mt-0.5 sm:hidden truncate">{user.email}</p>
                   <p className="text-slate-600 text-xs mt-0.5">
@@ -462,6 +546,18 @@ export function UserManagement({ currentUserId, initialUsers }: Props) {
                     className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-white/10 transition-all"
                   >
                     <KeyRound size={15} />
+                  </button>
+                  <button
+                    onClick={() => openModal("role", user)}
+                    disabled={user.id === currentUserId}
+                    title={user.id === currentUserId ? "Cannot change your own role" : user.role === "admin" ? "Revoke admin" : "Make admin"}
+                    className={`p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                      user.role === "admin"
+                        ? "text-amber-400 hover:bg-amber-500/10"
+                        : "text-slate-500 hover:text-amber-400 hover:bg-amber-500/10"
+                    }`}
+                  >
+                    {user.role === "admin" ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
                   </button>
                   <button
                     onClick={() => openModal("delete", user)}
@@ -488,6 +584,10 @@ export function UserManagement({ currentUserId, initialUsers }: Props) {
       {modal === "delete" && selectedUser && (
         <DeleteModal user={selectedUser} onClose={closeModal} onSuccess={handleDeleted} />
       )}
+      {modal === "role" && selectedUser && (
+        <SetRoleModal user={selectedUser} onClose={closeModal} onSuccess={handleRoleUpdated} />
+      )}
     </div>
+      </div>
   );
 }

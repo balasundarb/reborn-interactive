@@ -1,7 +1,7 @@
 // app/[locale]/(adminpanel)/adminpanel/page.tsx
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
+import { AnalyticsDashboard } from "@/components/adminpanel/analytics/AnalyticsDashboard";
 import type { VisitorStats } from "@/types/visitor";
 
 async function getStats(): Promise<VisitorStats | null> {
