@@ -3,12 +3,19 @@ import { connectDB } from "./mongodb";
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { Resend } from 'resend';
 import { resetPasswordTemplate } from "./email-templates/reset-password";
+import { admin } from "better-auth/plugins";
 
 const db = await connectDB();
 const resend = new Resend(process.env.RESEND_API_KEY);
+
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || 'my_secret_key_change_me_in_production',
   database: mongodbAdapter(db),
+
+  plugins: [
+    admin(),
+  ],
+
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
@@ -24,7 +31,7 @@ export const auth = betterAuth({
         });
 
         if (error) {
-          console.error(' Resend error:', error);
+          console.error('Resend error:', error);
           throw error;
         }
 
@@ -35,6 +42,7 @@ export const auth = betterAuth({
       }
     },
   },
+
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -49,7 +57,7 @@ export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: true,
-      maxAge: 5 * 60
-    }
-  }
+      maxAge: 5 * 60,
+    },
+  },
 });

@@ -8,6 +8,7 @@ export const makeStore = () => {
             settings: settingsSlice.reducer,
             visitorStats: visitorStatsReducer, // ← add
         },
+        devTools:false
     })
 }
 
