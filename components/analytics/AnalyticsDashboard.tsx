@@ -12,10 +12,12 @@ import {
   Activity, Eye, Globe, TrendingUp, Monitor, Smartphone,
   Clock, MousePointerClick, RefreshCw, LogOut, Users,
   LayoutDashboard, Map as MapIcon, BarChart2, ChevronRight,
+  Search,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "sonner"; 
+import Header from "./Header";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -374,73 +376,8 @@ export function AnalyticsDashboard({ user, initialStats }: Props) {
             style={{ background: `linear-gradient(90deg, ${ACCENT}, #ff6b6b)`, animation: "loadbar 1.2s ease infinite" }}
           />
         )}
-
-        {/* ── Topbar ── */}
-        <header
-          className="sticky top-0 z-40 flex items-center justify-between px-7 h-14 border-b"
-          style={{ background: "rgba(10,10,11,0.9)", backdropFilter: "blur(20px)", borderColor: BORDER_DIM }}
-        >
-          <div className="flex items-center gap-2.5 text-[13px] font-bold uppercase tracking-widest" style={{ color: "#f4f4f5" }}>
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: ACCENT, boxShadow: `0 0 14px ${ACCENT}60` }}
-            >
-              <LayoutDashboard size={13} color="#fff" />
-            </div>
-            Adminpanel
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 ${loading ? "spinning" : ""}`}
-              style={{ borderColor: BORDER_DIM, color: TEXT_MUTED, background: "transparent" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = ACCENT_BORDER;
-                (e.currentTarget as HTMLButtonElement).style.color = ACCENT;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = BORDER_DIM;
-                (e.currentTarget as HTMLButtonElement).style.color = TEXT_MUTED;
-              }}
-              onClick={() => void fetchStats(false)}
-            >
-              <RefreshCw size={12} />
-              Refresh
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                style={{ background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DIM})`, boxShadow: `0 0 10px ${ACCENT}40` }}
-              >
-                {initials}
-              </div>
-              <span className="text-sm font-medium" style={{ color: TEXT_MUTED }}>
-                {user.name ?? user.email}
-              </span>
-            </div>
-
-            <button
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200"
-              style={{ borderColor: `${ACCENT}30`, color: `${ACCENT}aa`, background: "transparent" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = `${ACCENT}10`;
-                (e.currentTarget as HTMLButtonElement).style.color = ACCENT;
-                (e.currentTarget as HTMLButtonElement).style.borderColor = ACCENT;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                (e.currentTarget as HTMLButtonElement).style.color = `${ACCENT}aa`;
-                (e.currentTarget as HTMLButtonElement).style.borderColor = `${ACCENT}30`;
-              }}
-              onClick={() => void handleSignOut()}
-            >
-              <LogOut size={12} />
-              Sign out
-            </button>
-          </div>
-        </header>
-
+ 
+<Header />
         {/* ── Body ── */}
         <main className="relative z-10 max-w-screen-xl mx-auto px-7 pt-9 pb-20">
 

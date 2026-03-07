@@ -16,9 +16,9 @@ export default function MainLayout({ children }: Props) {
         <VisitorTracker />
         <MyNavbar />
         <main>
-          <NetflixRedTransition>
+          {/* <NetflixRedTransition> */}
             {children}
-          </NetflixRedTransition>
+          {/* </NetflixRedTransition> */}
         </main>
         <Footer />
         <ScrollToTop />

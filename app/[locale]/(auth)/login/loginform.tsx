@@ -122,13 +122,13 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
 
                 <div className="flex justify-end">
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => window.location.href = '/forgot-password'}
                         className="text-sm font-medium text-[#d63031] hover:text-red-400 transition-colors"
                     >
                         Forgot password?
-                    </button>
+                    </button> */}
                 </div>
 
                 <button
@@ -184,12 +184,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
             </div>
 
-            <p className="mt-8 text-center text-slate-400 text-sm">
+            {/* <p className="mt-8 text-center text-slate-400 text-sm">
                 New here?{" "}
                 <button onClick={() => window.location.href = '/signup'} className="text-white font-bold hover:text-[#d63031] transition-colors hover:underline">
                     Create an account
                 </button>
-            </p>
+            </p> */}
         </div>
     );
 }

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Github, Twitter, Linkedin, Instagram, Heart, Send } from 'lucide-react';
 import { NextResponse } from 'next/server';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 const Footer: React.FC = () => {
 
@@ -64,23 +65,23 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 ))}
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 pt-24 pb-12 relative">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 pb-20">
+            <div className="max-w-7xl mx-auto px-6 pt-10 pb-4 relative">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
                     {/* Brand Identity */}
-                    <div className="lg:col-span-5 space-y-10">
-                        <div className="space-y-6 animate-[fadeInUp_0.6s_ease-out]">
+                    <div className="lg:col-span-5 space-y-5">
+                        <div className="space-y-4 animate-[fadeInUp_0.6s_ease-out]">
                             <div className="flex items-center gap-4 group">
-                                <div className="relative">
+                                 <Link href='/login' className="relative">
                                     {/* Pulsing Neon Ring */}
                                     <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[6px] opacity-40 animate-[pulse_2s_ease-in-out_infinite]"></div>
                                     <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[12px] opacity-20 animate-[pulse_2s_ease-in-out_infinite_0.5s]"></div>
                                     <img
                                         src="/favicon-384x384.png"
                                         alt="Re-born Interactive"
-                                        className="relative h-14 w-14 object-contain brightness-110 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12"
+                                        className="relative h-12 w-12 object-contain brightness-110 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12"
                                     />
-                                </div>
-                                <h3 className="text-white font-black text-3xl tracking-tighter italic uppercase cursor-default">
+                                </Link>
+                                <h3 className="text-white font-black text-2xl tracking-tighter italic uppercase cursor-default">
                                     RE-BORN
                                     <span className="inline-block text-[#d63031] drop-shadow-[0_0_8px_#d63031] animate-[blink_1.5s_ease-in-out_infinite]">
                                         .
@@ -88,7 +89,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                 </h3>
                             </div>
 
-                            <p className="text-lg text-gray-400 max-w-sm leading-relaxed font-light">
+                            <p className="text-base text-gray-400 max-w-sm leading-relaxed font-light">
                                 Architecting{' '}
                                 <span className="text-[#d63031] font-medium drop-shadow-[0_0_5px_rgba(214,48,49,0.5)] transition-all duration-300 hover:drop-shadow-[0_0_10px_rgba(214,48,49,0.8)]">
                                     digital emotions
@@ -98,7 +99,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                         </div>
 
                         {/* Animated Social Icons */}
-                        <div className="flex gap-4 animate-[fadeInUp_0.6s_ease-out_0.2s_both]">
+                        <div className="flex gap-3 animate-[fadeInUp_0.6s_ease-out_0.2s_both]">
                             {socialLinks.map((social, i) => {
                                 const Icon = social.icon;
                                 return (
@@ -106,13 +107,13 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                         key={social.label}
                                         href={social.href}
                                         aria-label={social.label}
-                                        className="relative group w-12 h-12 rounded-lg bg-black border border-[#d63031]/30 flex items-center justify-center transition-all duration-300 hover:border-[#d63031] hover:shadow-[0_0_15px_rgba(214,48,49,0.4)] hover:-translate-y-1 active:scale-95"
+                                        className="relative group w-10 h-10 rounded-lg bg-black border border-[#d63031]/30 flex items-center justify-center transition-all duration-300 hover:border-[#d63031] hover:shadow-[0_0_15px_rgba(214,48,49,0.4)] hover:-translate-y-1 active:scale-95"
                                         style={{ animationDelay: `${i * 0.1}s` }}
                                     >
                                         {/* Hover Glow Effect */}
                                         <div className="absolute inset-0 rounded-lg bg-[#d63031]/0 group-hover:bg-[#d63031]/10 transition-all duration-300" />
                                         <Icon
-                                            size={18}
+                                            size={16}
                                             className="relative text-gray-400 group-hover:text-white transition-all duration-300 group-hover:scale-110"
                                         />
                                     </a>
@@ -122,21 +123,21 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                     </div>
 
                     {/* Newsletter Section */}
-                    <div className="lg:col-span-7 space-y-12 animate-[fadeInUp_0.6s_ease-out_0.3s_both]">
+                    <div className="lg:col-span-7 space-y-6 animate-[fadeInUp_0.6s_ease-out_0.3s_both]">
                         <div className="relative">
                             {/* Animated Glow */}
                             <div className="absolute inset-0 bg-[#d63031]/5 blur-3xl rounded-full pointer-events-none animate-[pulse_3s_ease-in-out_infinite]" />
 
-                            <div className="relative border-l-4 border-[#d63031] bg-white/[0.02] p-8 md:p-10 backdrop-blur-sm overflow-hidden group hover:bg-white/[0.03] transition-all duration-500">
+                            <div className="relative border-l-4 border-[#d63031] bg-white/[0.02] p-6 backdrop-blur-sm overflow-hidden group hover:bg-white/[0.03] transition-all duration-500">
                                 {/* Animated Corner */}
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-[#d63031]/10 [clip-path:polygon(100%_0,100%_100%,0_0)] transition-all duration-500 group-hover:bg-[#d63031]/20" />
 
                                 {/* Scanning Line Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#d63031]/5 to-transparent h-full w-full animate-[scan_3s_ease-in-out_infinite] pointer-events-none" />
 
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
-                                    <div className="space-y-2">
-                                        <h4 className="text-2xl font-black text-white italic tracking-tight uppercase">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                                    <div className="space-y-1">
+                                        <h4 className="text-xl font-black text-white italic tracking-tight uppercase">
                                             Join the <span className="text-[#d63031]">Network</span>
                                         </h4>
                                     </div>
@@ -152,7 +153,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                                     }
                                                     placeholder="youremail@gmail.com"
                                                     required
-                                                    className="w-full bg-black/60 border py-4 px-5 text-sm text-white outline-none transition-all duration-300 placeholder:text-gray-600 font-mono border-[#d63031]/50 focus:border-[#d63031]/80 focus:shadow-[0_0_15px_rgba(214,48,49,0.2)] group-hover/input:border-white/20"
+                                                    className="w-full bg-black/60 border py-3 px-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-gray-600 font-mono border-[#d63031]/50 focus:border-[#d63031]/80 focus:shadow-[0_0_15px_rgba(214,48,49,0.2)] group-hover/input:border-white/20"
                                                 />
                                                 {/* Input Glow on Focus */}
                                                 <div className="absolute inset-0 border border-[#d63031]/0 pointer-events-none transition-all duration-300 focus-within:border-[#d63031]/30" />
@@ -160,7 +161,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                             <button
                                                 type="submit"
                                                 disabled={isSubmitting}
-                                                className="relative bg-[#d63031] hover:bg-[#b92a2a] text-white px-6 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#d63031]/20 hover:shadow-[#d63031]/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn"
+                                                className="relative bg-[#d63031] hover:bg-[#b92a2a] text-white px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#d63031]/20 hover:shadow-[#d63031]/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn"
                                             >
                                                 {/* Button Shine Effect */}
                                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
@@ -177,39 +178,49 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                
                                     </form>
                                 </div>
+                                
                             </div>
+                               {/* Footer Navigation */}
+                        <nav className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-white/60 md:justify-end mt-10 justify-center ">
+                            {['Privacy', 'Terms', 'Cookies'].map((item) => (
+                                <a
+                                    key={item}
+                                    href="#"
+                                    className="relative hover:text-white transition-colors duration-300 group/link"
+                                >
+                                    {item}
+                                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#d63031] transition-all duration-300 group-hover/link:w-full" />
+                                </a>
+                            ))}
+                        </nav>
                         </div>
+                        
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-10 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-6 animate-[fadeInUp_0.6s_ease-out_0.4s_both]">
-                    <div className="flex flex-col items-center md:items-start gap-1">
-                        <p className="text-[10px] uppercase md:tracking-[0.5em] text-white/50 ">
-                            &copy;  Re-born Interactive Co., Ltd.{new Date().getFullYear()}. All Rights Reserved.
-                        </p>
-                        <p className="text-[10px] text-gray-600 flex items-center gap-1">
-                            Crafted with{' '}
-                            <Heart
-                                size={10}
-                                className="text-[#d63031] animate-[heartbeat_1.5s_ease-in-out_infinite]"
-                            />{' '}
-                            in Tamil Nadu, India
-                        </p>
-                    </div>
+                <div className="w-full bg-zinc-950  py-2"> 
+                    <div className="pt-4 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-4">
+                        {/* Copyright & Credits */}
+                        <div className="max-md:flex-col flex items-center justify-between md:items-start gap-1 w-full">
+                            <p className="text-[10px] uppercase md:tracking-[0.5em] text-white/60">
+                                &copy; Re-born Interactive Co., Ltd. {new Date().getFullYear()}. All Rights Reserved.
+                            </p>
+                            <p className="text-[10px] text-white/60 flex items-center gap-1">
+                                Designed & Developed by
+                                <a 
+                                    href="https://www.tagfinity.in/" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="ml-1 font-medium text-red-400 hover:text-red-500 transition-colors"
+                                >
+                                    TagFinity India
+                                </a>
+                            </p>
+                        </div>
 
-                    <nav className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-gray-500">
-                        {['Privacy', 'Terms', 'Cookies'].map((item, i) => (
-                            <a
-                                key={item}
-                                href="#"
-                                className="relative hover:text-white transition-colors duration-300 group/link"
-                            >
-                                {item}
-                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#d63031] transition-all duration-300 group-hover/link:w-full" />
-                            </a>
-                        ))}
-                    </nav>
+                     
+                    </div>
                 </div>
             </div>
 
