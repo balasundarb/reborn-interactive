@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 
 // ─── Particle type ────────────────────────────────────────────────────────────
 interface Particle {
@@ -11,35 +12,31 @@ interface Particle {
 }
 
 // ─── Pre-bake glow dot into an offscreen canvas ──────────────────────────────
-const bakeGlowSprite = (() => {
-  const cache = new Map<number, HTMLCanvasElement>();
-  return (radius: number): HTMLCanvasElement => {
-    if (cache.has(radius)) return cache.get(radius)!;
-    const size = Math.ceil(radius * 8);
-    const oc = document!.createElement("canvas")!;
-    oc.width = oc.height = size;
-    const c = oc.getContext("2d")!;
-    const cx = size / 2;
+const bakeGlowSprite = (radius: number): HTMLCanvasElement | null => {
+  if (typeof document === "undefined") return null;
+  const size = Math.ceil(radius * 8);
+  const oc = document.createElement("canvas");
+  oc.width = oc.height = size;
+  const c = oc.getContext("2d")!;
+  const cx = size / 2;
 
-    const halo = c.createRadialGradient(cx, cx, 0, cx, cx, size / 2);
-    halo.addColorStop(0, "rgba(214,48,49,0.55)");
-    halo.addColorStop(0.45, "rgba(214,48,49,0.15)");
-    halo.addColorStop(1, "rgba(214,48,49,0)");
-    c.fillStyle = halo;
-    c.fillRect(0, 0, size, size);
+  const halo = c.createRadialGradient(cx, cx, 0, cx, cx, size / 2);
+  halo.addColorStop(0, "rgba(214,48,49,0.55)");
+  halo.addColorStop(0.45, "rgba(214,48,49,0.15)");
+  halo.addColorStop(1, "rgba(214,48,49,0)");
+  c.fillStyle = halo;
+  c.fillRect(0, 0, size, size);
 
-    const core = c.createRadialGradient(cx, cx, 0, cx, cx, radius * 1.1);
-    core.addColorStop(0, "rgba(255,140,140,1)");
-    core.addColorStop(1, "rgba(214,48,49,0)");
-    c.fillStyle = core;
-    c.beginPath();
-    c.arc(cx, cx, radius * 1.1, 0, Math.PI * 2);
-    c.fill();
+  const core = c.createRadialGradient(cx, cx, 0, cx, cx, radius * 1.1);
+  core.addColorStop(0, "rgba(255,140,140,1)");
+  core.addColorStop(1, "rgba(214,48,49,0)");
+  c.fillStyle = core;
+  c.beginPath();
+  c.arc(cx, cx, radius * 1.1, 0, Math.PI * 2);
+  c.fill();
 
-    cache.set(radius, oc);
-    return oc;
-  };
-})();
+  return oc;
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
@@ -62,7 +59,13 @@ const HeroSection: React.FC = () => {
   const [videoError, setVideoError] = useState(false);
   const [time, setTime] = useState("00:00:00"); // kept for future use
 
-  const sprites = useMemo(() => [1.1, 1.6, 2.1].map(bakeGlowSprite), []);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
+
+  const sprites = useMemo(() => {
+    if (!isClient) return [];
+    return [1.1, 1.6, 2.1].map(bakeGlowSprite).filter(Boolean) as HTMLCanvasElement[];
+  }, [isClient]);
 
   // Clock logic (unused but kept)
   useEffect(() => {
@@ -116,7 +119,7 @@ const HeroSection: React.FC = () => {
   // Particle System
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || sprites.length === 0) return;
     const ctx = canvas.getContext("2d", { alpha: true })!;
     let W = window.innerWidth, H = window.innerHeight;
 
@@ -140,6 +143,7 @@ const HeroSection: React.FC = () => {
         if (p.x > W + 30) p.x = -30;
 
         const s = sprites[p.spriteIdx];
+        if (!s) return;
         ctx.globalAlpha = 0.2 + Math.abs(Math.sin(Date.now() * 0.001)) * 0.3;
         ctx.drawImage(s, p.x - s.width / 2, p.y - s.height / 2);
       });
@@ -178,7 +182,18 @@ const HeroSection: React.FC = () => {
           mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
           -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
         }
+
+        .hero-bg-texture {
+          background-image: url('/assets/hero/intro.png');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.15;
+          filter: grayscale(1) contrast(1.2);
+        }
       `}</style>
+
+      {/* Background Texture Overlay */}
+      <div className="absolute inset-0 z-0 hero-bg-texture pointer-events-none" />
 
       {/* Video layer with bottom fade */}
       {!videoError && (
@@ -201,6 +216,16 @@ const HeroSection: React.FC = () => {
 
       {/* Main Content (Headline) */}
       <div ref={parallaxTitleRef} className="relative z-40 flex flex-col items-center pointer-events-none">
+        {/* Animated Logo Overlay */}
+        <div className={`mb-4 transition-all duration-1000 ${titleVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          <video
+            autoPlay loop muted playsInline
+            className="w-120 md:w-180 h-auto mix-blend-screen"
+          >
+            <source src="/assets/game/Logo_Animation_Transparant.webm" type="video/webm" />
+          </video>
+        </div>
+
         <div
           className={`transition-all duration-1000 ease-out transform ${titleVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
             }`}
@@ -220,15 +245,33 @@ const HeroSection: React.FC = () => {
           </h1>
 
           <div className="flex items-center gap-6 mt-6 justify-center">
-            <div className="h-[1px] w-16 bg-[#d63031] shadow-[0_0_10px_#d63031]" />
+            <div className="h-px w-16 bg-[#d63031] shadow-[0_0_10px_#d63031]" />
             <span className="text-white/40 text-[10px] tracking-[0.8em] uppercase">Initialize Sequence</span>
-            <div className="h-[1px] w-16 bg-[#d63031] shadow-[0_0_10px_#d63031]" />
+            <div className="h-px w-16 bg-[#d63031] shadow-[0_0_10px_#d63031]" />
           </div>
         </div>
       </div>
 
+      {/* Scroll Indicator */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center space-y-4"
+      >
+        <div className="w-px h-12 bg-linear-to-b from-[#d63031] to-transparent" />
+        <div className="w-6 h-10 border border-white/20 rounded-full flex justify-center p-1">
+          <motion.div 
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-1 h-2 bg-[#d63031] rounded-full"
+          />
+        </div>
+        <span className="text-[10px] uppercase tracking-[0.4em] text-white/40 font-mono">Scroll</span>
+      </motion.div>
+
       {/* Bottom smoothing transition */}
-      <div className="fixed bottom-0 left-0 w-full h-40 z-50 bg-gradient-to-t from-[#020202] via-[#020202]/80 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-40 z-40 bg-linear-to-t from-[#020202] via-[#020202]/80 to-transparent pointer-events-none" />
     </section>
   );
 };

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "lenis";
 import Image from "next/image";
 
 if (typeof window !== "undefined") {
@@ -615,7 +615,7 @@ export default function AboutPage() {
       {/* Page Loader - no CSS transition to avoid conflict */}
       <div
         ref={loaderRef}
-        className="page-loader fixed inset-0 bg-[#080808] z-[10001] flex items-center justify-center"
+        className="page-loader fixed inset-0 bg-[#080808] z-10001 flex items-center justify-center"
         style={{ transition: "none" }} // Disable any CSS transitions
       >
         <div className="relative">
@@ -744,8 +744,8 @@ export default function AboutPage() {
               backgroundPosition: "center 30%"
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-[#080808]/30" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#080808] via-[#080808]/80 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-[#080808] via-transparent to-[#080808]/30" />
 
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-[#c0392b]/10 rounded-full blur-[120px] opacity-50" />
           <div className="absolute top-0 right-0 w-80 h-80 bg-[#c0392b]/5 rounded-full blur-[100px] opacity-30" />
@@ -773,7 +773,7 @@ export default function AboutPage() {
               <em className="text-white not-italic border-b border-[#c0392b] pb-px">we recreate moments in time.</em>
             </p>
             <div className="hero-scroll mt-12 flex items-center gap-4">
-              <div className="w-px h-16 bg-gradient-to-b from-transparent via-[#c0392b] to-transparent" />
+              <div className="w-px h-16 bg-linear-to-b from-transparent via-[#c0392b] to-transparent" />
               <span className="font-mono text-[10px] tracking-[0.4em] text-neutral-400 uppercase">Scroll to Explore</span>
             </div>
           </div>
@@ -836,7 +836,7 @@ export default function AboutPage() {
               </div>
 
               <div className="quote-card relative mt-4 lg:mt-14">
-                <div className="absolute -inset-px bg-gradient-to-br from-[#c0392b]/20 to-transparent rounded-lg" />
+                <div className="absolute -inset-px bg-linear-to-br from-[#c0392b]/20 to-transparent rounded-lg" />
                 <div className="relative p-10 md:p-12 border border-neutral-800/60 bg-neutral-900/20 backdrop-blur-sm rounded-lg">
                   <div
                     className="font-serif absolute -top-5 -left-1 pointer-events-none select-none text-[6.5rem] leading-none text-[#c0392b] opacity-10"
@@ -940,9 +940,9 @@ export default function AboutPage() {
 
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="flex items-center gap-5 mb-16">
-              <div className="philo-divider-left h-px flex-1 origin-left bg-gradient-to-r from-[#c0392b] to-transparent" />
+              <div className="philo-divider-left h-px flex-1 origin-left bg-linear-to-r from-[#c0392b] to-transparent" />
               <span className="font-mono text-[#c0392b] text-[12px] tracking-[0.5em] uppercase">Our Philosophy</span>
-              <div className="philo-divider-right h-px flex-1 origin-right bg-gradient-to-l from-[#c0392b] to-transparent" />
+              <div className="philo-divider-right h-px flex-1 origin-right bg-linear-to-l from-[#c0392b] to-transparent" />
             </div>
 
             <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-6 md:gap-12 lg:gap-20">

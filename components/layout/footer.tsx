@@ -41,14 +41,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const socialLinks: { icon: typeof Twitter; href: string; label: string }[] = [
         { icon: Twitter, href: 'https://x.com/RebornInte41311', label: 'Twitter' },
         { icon: Github, href: 'https://github.com/reborninteractive36', label: 'GitHub' },
-        { icon: Linkedin, href: '#', label: 'LinkedIn' },
+        { icon: Linkedin, href: 'https://www.linkedin.com/company/reborn-interactive-games/', label: 'LinkedIn' },
         { icon: Instagram, href: 'https://www.instagram.com/reborninteractive_/', label: 'Instagram' },
     ];
 
     return (
         <footer className="relative z-10 bg-[#020202] text-gray-300 border-t border-[#d63031]/20 overflow-hidden">
             {/* Animated Background Grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none animate-[grid-flow_20s_linear_infinite]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none animate-[grid-flow_20s_linear_infinite]" />
 
             {/* Floating Particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -74,7 +74,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                  <Link href='/login' className="relative">
                                     {/* Pulsing Neon Ring */}
                                     <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[6px] opacity-40 animate-[pulse_2s_ease-in-out_infinite]"></div>
-                                    <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[12px] opacity-20 animate-[pulse_2s_ease-in-out_infinite_0.5s]"></div>
+                                    <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-md opacity-20 animate-[pulse_2s_ease-in-out_infinite_0.5s]"></div>
                                     <img
                                         src="/favicon-384x384.png"
                                         alt="Re-born Interactive"
@@ -128,23 +128,23 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             {/* Animated Glow */}
                             <div className="absolute inset-0 bg-[#d63031]/5 blur-3xl rounded-full pointer-events-none animate-[pulse_3s_ease-in-out_infinite]" />
 
-                            <div className="relative border-l-4 border-[#d63031] bg-white/[0.02] p-6 backdrop-blur-sm overflow-hidden group hover:bg-white/[0.03] transition-all duration-500">
+                            <div className="relative border-l-4 flex flex-col justify-center items-center border-[#d63031] bg-white/2 p-6 backdrop-blur-sm overflow-hidden group hover:bg-white/3 transition-all duration-500">
                                 {/* Animated Corner */}
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-[#d63031]/10 [clip-path:polygon(100%_0,100%_100%,0_0)] transition-all duration-500 group-hover:bg-[#d63031]/20" />
 
                                 {/* Scanning Line Effect */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#d63031]/5 to-transparent h-full w-full animate-[scan_3s_ease-in-out_infinite] pointer-events-none" />
+                                <div className="absolute inset-0 bg-linear-to-b from-transparent via-[#d63031]/5 to-transparent h-full w-full animate-[scan_3s_ease-in-out_infinite] pointer-events-none" />
 
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                                    <div className="space-y-1">
-                                        <h4 className="text-xl font-black text-white italic tracking-tight uppercase">
-                                            Join the <span className="text-[#d63031]">Network</span>
-                                        </h4>
+                                    <div className="space-y-1 my-auto">
+                                           <h2 className="font-cinzel text-xl md:text-3xl font-black mb-6">
+            STAY <span className="text-[#d63031]">SYNCED</span>
+          </h2>
                                     </div>
 
-                                    <form onSubmit={handleSubmit} className="flex-grow max-w-md">
+                                    <form onSubmit={handleSubmit} className="grow max-w-md">
                                         <div className="relative flex items-center gap-2">
-                                            <div className="relative flex-grow group/input">
+                                            <div className="relative grow group/input">
                                                 <input
                                                     type="email"
                                                     value={email}
@@ -164,7 +164,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                                 className="relative bg-[#d63031] hover:bg-[#b92a2a] text-white px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-[#d63031]/20 hover:shadow-[#d63031]/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn"
                                             >
                                                 {/* Button Shine Effect */}
-                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                                                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
                                                 <span className="relative">
                                                     {isSubmitting ? 'Joining...' : 'Join'}
                                                 </span>
@@ -178,6 +178,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                
                                     </form>
                                 </div>
+                                   <p className="font-mono-tech text-[#d63031] text-[10px] md:text-xs tracking-[0.4em] uppercase mb-10  mx-auto">
+            Join the collective. Never miss a transmission.
+          </p>
                                 
                             </div>
                                {/* Footer Navigation */}
@@ -189,7 +192,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                     className="relative hover:text-white transition-colors duration-300 group/link"
                                 >
                                     {item}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#d63031] transition-all duration-300 group-hover/link:w-full" />
+                                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#d63031] transition-all duration-300 group-hover/link:w-full" />
                                 </a>
                             ))}
                         </nav>
@@ -200,7 +203,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
                 {/* Bottom Bar */}
                 <div className="w-full bg-zinc-950  py-2"> 
-                    <div className="pt-4 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                         {/* Copyright & Credits */}
                         <div className="max-md:flex-col flex items-center justify-between md:items-start gap-1 w-full">
                             <p className="text-[10px] uppercase md:tracking-[0.5em] text-white/60">
@@ -226,9 +229,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
             {/* Animated Accent Line */}
             <div className="h-1 w-full flex overflow-hidden">
-                <div className="h-full w-1/3 bg-gradient-to-r from-transparent to-[#d63031] animate-[slideInLeft_1s_ease-out]" />
+                <div className="h-full w-1/3 bg-linear-to-r from-transparent to-[#d63031] animate-[slideInLeft_1s_ease-out]" />
                 <div className="h-full w-1/3 bg-[#d63031] animate-[pulse_2s_ease-in-out_infinite]" />
-                <div className="h-full w-1/3 bg-gradient-to-l from-transparent to-[#d63031] animate-[slideInRight_1s_ease-out]" />
+                <div className="h-full w-1/3 bg-linear-to-l from-transparent to-[#d63031] animate-[slideInRight_1s_ease-out]" />
             </div>
 
             <style jsx>{`

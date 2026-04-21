@@ -35,7 +35,7 @@ export function MyNavbar() {
 
   return (
     <>
-      <nav className="absolute top-0 left-0 z-50 flex w-full items-center justify-between px-8 py-6">
+      <nav className="fixed top-0 left-0 z-[60] flex w-full items-center justify-between px-8 py-6 transition-all duration-300">
         {/* Logo - Kept Original Colors */}
         <Link href='/' className="relative">
           <Image
