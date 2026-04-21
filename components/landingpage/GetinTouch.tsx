@@ -83,7 +83,7 @@ export function GetInTouch({ isOpen, onClose }: GetInTouchProps) {
       {/* Backdrop */}
       <div
         onClick={handleClose}
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-md transition-opacity duration-500 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 z-[100] bg-black/60 backdrop-blur-md transition-opacity duration-500 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         aria-hidden="true"
       />
@@ -92,7 +92,7 @@ export function GetInTouch({ isOpen, onClose }: GetInTouchProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className={`fixed top-0 right-0 z-50 h-full w-full max-w-lg flex flex-col
+        className={`fixed top-0 right-0 z-[110] h-full w-full max-w-lg flex flex-col
           bg-[#0a0a0a] border-l border-white/5 text-white shadow-[20px_0_50px_rgba(0,0,0,0.5)]
           transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]
           ${isOpen ? "translate-x-0" : "translate-x-full"}`}

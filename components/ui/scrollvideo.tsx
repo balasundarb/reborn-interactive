@@ -5,12 +5,14 @@ import {
     useScroll,
     useSpring,
     useTransform,
-    useMotionValueEvent
+    useMotionValueEvent,
+    motion
 } from "framer-motion";
 
 export default function UltraSmoothScrollVideo() {
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const lastTimeRef = useRef(0);
     const [duration, setDuration] = useState(0);
 
     const { scrollYProgress } = useScroll({
@@ -26,31 +28,33 @@ export default function UltraSmoothScrollVideo() {
     });
 
     const targetTime = useTransform(smoothProgress, [0, 1], [0, duration]);
-
-    let lastTime = 0;
+    const opacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
 
     useMotionValueEvent(targetTime, "change", (latest) => {
         const video = videoRef.current;
         if (!video || video.readyState < 2) return;
 
         // Avoid micro updates
-        if (Math.abs(latest - lastTime) < 0.01) return;
+        if (Math.abs(latest - lastTimeRef.current) < 0.01) return;
 
         // Smooth interpolation
-        const smoothTime = lastTime + (latest - lastTime) * 0.25;
+        const smoothTime = lastTimeRef.current + (latest - lastTimeRef.current) * 0.25;
 
         video.currentTime = smoothTime;
-        lastTime = smoothTime;
+        lastTimeRef.current = smoothTime;
     });
 
     return (
         <div className="relative">
             <div ref={containerRef} className="h-[350vh] bg-black">
 
-                <div className="fixed z-10 inset-0 h-screen w-full overflow-hidden pointer-events-none">
+                <motion.div 
+                    style={{ opacity }}
+                    className="fixed z-50 inset-0 h-screen w-full overflow-hidden pointer-events-none"
+                >
                     <video
                         ref={videoRef}
-                        src="/video/video.webm"
+                        src="/video/character.webm"
                         muted
                         playsInline
                         preload="auto"
@@ -64,7 +68,7 @@ export default function UltraSmoothScrollVideo() {
                         }
                     />
 
-                </div>
+                </motion.div>
 
                  
             </div>

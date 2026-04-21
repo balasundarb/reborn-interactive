@@ -69,13 +69,13 @@ export default function ScrollToTop() {
               strokeWidth="4"
               fill="transparent"
               strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
               animate={{
                 strokeDashoffset:
                   circumference -
                   (circumference * scrollPercentage) / 100,
               }}
               className="text-[#d63031]"
-          
             />
           </svg>
 
