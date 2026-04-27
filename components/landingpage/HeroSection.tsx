@@ -203,7 +203,7 @@ const HeroSection: React.FC = () => {
           preload="auto"
           onCanPlay={handleVideoReady}
           onError={handleVideoError}
-          className={`absolute z-20 inset-0 w-full h-full object-cover transition-opacity duration-1000 mask-video ${!titleVisible && videoReady ? 'opacity-100' : 'opacity-0'
+          className={`absolute z-20 inset-0 w-full h-full object-cover transition-opacity duration-1000 mask-video ${videoReady ? 'opacity-100' : 'opacity-0'
             }`}
         >
           <source src="/video/Intro.webm" type="video/webm" />

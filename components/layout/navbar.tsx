@@ -35,7 +35,7 @@ export function MyNavbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 z-[60] flex w-full items-center justify-between px-8 py-6 transition-all duration-300">
+      <nav className="fixed top-0 left-0 z-60 flex w-full items-center justify-between px-8 py-6 transition-all duration-300">
         {/* Logo - Kept Original Colors */}
         <Link href='/' className="relative">
           <Image
@@ -70,7 +70,7 @@ export function MyNavbar() {
             aria-label="Toggle menu"
           >
             {/* Top Bar */}
-            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 -rotate-45 translate-y-[1px]' : 'w-8'
+            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 -rotate-45 translate-y-px' : 'w-8'
               }`} />
 
             {/* Middle Bar */}
@@ -78,7 +78,7 @@ export function MyNavbar() {
               }`} />
 
             {/* Bottom Bar */}
-            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 rotate-45 -translate-y-[1px]' : 'w-8'
+            <span className={`h-0.5 bg-red-600 transition-all duration-300 origin-right ${isMenuOpen ? 'w-8 rotate-45 -translate-y-px' : 'w-8'
               }`} />
           </button>
         </div>

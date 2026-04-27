@@ -50,11 +50,11 @@ export default function UltraSmoothScrollVideo() {
 
                 <motion.div 
                     style={{ opacity }}
-                    className="fixed z-50 inset-0 h-screen w-full overflow-hidden pointer-events-none"
+                    className="sticky top-0 inset-0 h-screen w-full overflow-hidden pointer-events-none"
                 >
                     <video
                         ref={videoRef}
-                        src="/video/character.webm"
+                        src="/video/Character.webm"
                         muted
                         playsInline
                         preload="auto"
