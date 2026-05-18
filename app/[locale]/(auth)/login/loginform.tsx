@@ -68,7 +68,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         }
 
     } catch (error: any) {
-         toast.custom(error.message || "Invalid credentials");
+         toast.error(error.message || "Invalid credentials");
     } finally {
         setIsLoading(false);
     }
