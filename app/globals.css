@@ -153,7 +153,7 @@
 
 @layer components {
   .btn-primary {
-    @apply relative px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-lg
+    @apply relative px-8 py-3 bg-linear-to-r from-red-500 to-red-600 text-white font-bold rounded-lg
            transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30
            active:scale-95 overflow-hidden;
   }
@@ -170,7 +170,7 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-red-500 to-red-600 bg-clip-text text-transparent;
   }
 
   .pulse-ring {
@@ -252,3 +252,97 @@
     @apply bg-background text-foreground;
   }
 }
+/* ── Notion Editor ──────────────────────────────────────────────────────── */
+
+.notion-editor-content .tiptap {
+  @apply p-6 text-white outline-none min-h-[520px];
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* Placeholder */
+.notion-editor-content .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-slate-600 pointer-events-none float-left h-0;
+}
+
+/* Headings */
+.notion-editor-content .tiptap h1 { @apply text-3xl font-bold mt-6 mb-3 text-white; }
+.notion-editor-content .tiptap h2 { @apply text-2xl font-bold mt-5 mb-2 text-white; }
+.notion-editor-content .tiptap h3 { @apply text-xl font-semibold mt-4 mb-2 text-white; }
+.notion-editor-content .tiptap h4 { @apply text-lg font-semibold mt-3 mb-1 text-slate-100; }
+
+/* Paragraph */
+.notion-editor-content .tiptap p { @apply my-1.5; }
+
+/* Lists */
+.notion-editor-content .tiptap ul { @apply list-disc pl-6 my-2 space-y-1; }
+.notion-editor-content .tiptap ol { @apply list-decimal pl-6 my-2 space-y-1; }
+
+/* Task list */
+.notion-editor-content .tiptap ul[data-type="taskList"] { @apply list-none pl-0; }
+.notion-editor-content .tiptap ul[data-type="taskList"] li { @apply flex items-start gap-2 my-1; }
+.notion-editor-content .tiptap ul[data-type="taskList"] li > label { @apply shrink-0 mt-0.5; }
+.notion-editor-content .tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+  @apply w-4 h-4 rounded border-slate-600 bg-slate-700 accent-[#d63031] cursor-pointer;
+}
+.notion-editor-content .tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+  @apply line-through text-slate-500;
+}
+
+/* Blockquote */
+.notion-editor-content .tiptap blockquote {
+  @apply border-l-4 border-[#d63031] pl-4 my-3 italic text-slate-400;
+}
+
+/* Inline code */
+.notion-editor-content .tiptap code {
+  @apply bg-slate-800 text-[#d63031] px-1.5 py-0.5 rounded text-[0.875em] font-mono;
+}
+
+/* Code block */
+.notion-editor-content .tiptap pre {
+  @apply bg-slate-950 border border-white/10 rounded-xl p-4 my-4 overflow-x-auto;
+}
+.notion-editor-content .tiptap pre code {
+  @apply bg-transparent text-slate-300 p-0 text-sm;
+}
+
+/* HR */
+.notion-editor-content .tiptap hr {
+  @apply border-none border-t border-white/10 my-5;
+}
+
+/* Links */
+.notion-editor-content .tiptap a {
+  @apply text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors cursor-pointer;
+}
+
+/* Images */
+.notion-editor-content .tiptap img {
+  @apply max-w-full rounded-xl my-3 mx-auto block;
+}
+.notion-editor-content .tiptap img.ProseMirror-selectednode {
+  @apply outline outline-[#d63031] outline-offset-2;
+}
+
+/* Table */
+.notion-editor-content .tiptap table {
+  @apply w-full border-collapse my-4 text-sm;
+}
+.notion-editor-content .tiptap th {
+  @apply bg-slate-800 text-slate-300 font-semibold px-3 py-2 border border-white/10 text-left;
+}
+.notion-editor-content .tiptap td {
+  @apply px-3 py-2 border border-white/10 text-slate-300 align-top;
+}
+.notion-editor-content .tiptap tr:hover td { @apply bg-white/2; }
+
+/* Selected cell */
+.notion-editor-content .tiptap .selectedCell { @apply bg-[#d63031]/10; }
+
+/* Column resize handle */
+.notion-editor-content .tiptap .column-resize-handle {
+  @apply absolute right-0 top-0 bottom-0 w-0.5 bg-[#d63031]/50 pointer-events-none;
+}
+.notion-editor-content .tiptap.resize-cursor { cursor: col-resize; }

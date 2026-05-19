@@ -7,8 +7,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Header from "@/components/adminpanel/Header";
-import { EmailEditor } from "./EmailEditor";
 import { SubscribersList, Subscriber } from "./SubscribersList";
+import { NotionEditor } from "@/components/email-editor/EmailEditor";
 
 // ─── Email wrappers / templates ──────────────────────────────────────────────
 const TEMPLATES: { label: string; html: string }[] = [
@@ -297,7 +297,11 @@ export function NewsletterDashboard({ initialSubscribers }: Props) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 px-1">
                 Email Body
               </p>
-              <EmailEditor value={htmlContent} onChange={setHtmlContent} />
+             <NotionEditor
+  value={htmlContent}
+  onChange={setHtmlContent}
+  placeholder="Start composing your email…"
+/>
             </div>
 
             {/* Send button */}
@@ -305,7 +309,7 @@ export function NewsletterDashboard({ initialSubscribers }: Props) {
               id="newsletter-send-btn"
               onClick={handleSend}
               disabled={isSending || recipientCount === 0}
-              className="w-full flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-[#d63031] to-[#b02828] hover:from-[#b02828] hover:to-[#901f1f] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-extrabold text-base shadow-xl shadow-red-900/30 transition-all active:scale-[0.99] tracking-wide"
+              className="w-full flex items-center justify-center gap-3 py-4 bg-linear-to-r from-[#d63031] to-[#b02828] hover:from-[#b02828] hover:to-[#901f1f] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-extrabold text-base shadow-xl shadow-red-900/30 transition-all active:scale-[0.99] tracking-wide"
             >
               {isSending
                 ? <><Loader2 className="animate-spin" size={20} /> Sending…</>
