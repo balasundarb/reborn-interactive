@@ -96,6 +96,7 @@ const ProjectCard = ({ project, index }: { project: any; index: number }) => {
           src={project.image}
           alt={project.title}
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover grayscale-50 group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-110"
         />
       )}

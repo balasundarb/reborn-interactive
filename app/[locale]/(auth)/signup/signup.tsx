@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import {
   User, Mail, Lock, ShieldCheck, ArrowRight,
-  Github, Eye, EyeOff, Loader2
+  Eye, EyeOff, Loader2
 } from 'lucide-react';
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 interface SignupFormProps {
@@ -182,7 +182,7 @@ export function SignupForm({ onSignup, onSocialSignup }: SignupFormProps) {
           }}
           className="flex-1 flex justify-center py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-white group"
         >
-          <Github size={20} className="group-hover:scale-110 transition-transform" />
+          <FaGithub size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
 

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { withDB } from "@/lib/mongodb";
+import { requireAdminSession } from "@/lib/admin-auth";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { subject, htmlContent, targetEmails, sendToAll } = body as {

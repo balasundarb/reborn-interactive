@@ -4,12 +4,20 @@ import { withDB } from "@/lib/mongodb";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email } = body;
+    const rawEmail = body?.email;
 
-    // Email format validation
+    if (typeof rawEmail !== "string") {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      );
+    }
+
+    const email = rawEmail.trim().toLowerCase();
+    // Email format and length validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email || !emailRegex.test(email)) {
+    if (!email || email.length > 254 || !emailRegex.test(email)) {
       return NextResponse.json(
         { error: "Invalid email format" },
         { status: 400 }

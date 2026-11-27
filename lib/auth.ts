@@ -9,7 +9,11 @@ const db = await connectDB();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET || 'my_secret_key_change_me_in_production',
+  secret:
+    process.env.BETTER_AUTH_SECRET ??
+    (process.env.NODE_ENV === "development"
+      ? "dev_only_secret_replace_with_BETTER_AUTH_SECRET"
+      : undefined),
   database: mongodbAdapter(db),
 
   plugins: [

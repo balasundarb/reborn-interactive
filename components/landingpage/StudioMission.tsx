@@ -78,28 +78,35 @@ const StudioMission = () => {
         <div className="absolute bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-[#d63031]/5 rounded-full blur-[120px] pointer-events-none" />
 
         {/* Floating Tech Symbols */}
-        {[...Array(6)].map((_, i) => (
+        {[
+          { symbol: "< />", x: "12%", y: "18%", duration: 18 },
+          { symbol: "01", x: "82%", y: "24%", duration: 21 },
+          { symbol: "RX-9", x: "26%", y: "74%", duration: 16 },
+          { symbol: "∑", x: "72%", y: "68%", duration: 23 },
+          { symbol: "∫", x: "48%", y: "14%", duration: 19 },
+          { symbol: "∆", x: "88%", y: "82%", duration: 22 },
+        ].map((item, i) => (
           <motion.div
-            key={i}
-            initial={{ 
-              x: Math.random() * 100 + "%", 
-              y: Math.random() * 100 + "%",
-              opacity: 0 
+            key={item.symbol}
+            initial={{
+              x: item.x,
+              y: item.y,
+              opacity: 0,
             }}
-            animate={{ 
+            animate={{
               y: [null, "-=100", "+=50"],
               opacity: [0, 0.15, 0],
-              rotate: [0, 180, 360]
+              rotate: [0, 180, 360],
             }}
-            transition={{ 
-              duration: 15 + Math.random() * 10, 
-              repeat: Infinity, 
+            transition={{
+              duration: item.duration,
+              repeat: Infinity,
               ease: "linear",
-              delay: i * 2
+              delay: i * 2,
             }}
             className="absolute text-[#d63031] font-mono text-[10px] pointer-events-none select-none"
           >
-            {["< />", "01", "RX-9", "∑", "∫", "∆"][i % 6]}
+            {item.symbol}
           </motion.div>
         ))}
       </div>

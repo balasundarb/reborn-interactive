@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, Github, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { FaGoogle } from "react-icons/fa";
+import { User, Lock, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import { toast } from 'sonner';
 interface LoginFormProps {
     onSubmit?: (email: string, password: string) => Promise<void> | void;
@@ -179,7 +179,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             await authClient.signIn.social({ provider: 'github', callbackURL: "/adminpanel" });
                         }
                     }}
-                    icon={<Github size={20} />}
+                    icon={<FaGithub size={20} />}
                 />
 
             </div>

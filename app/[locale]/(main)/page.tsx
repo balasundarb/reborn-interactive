@@ -2,49 +2,68 @@
 
 import Careers from "@/components/landingpage/Careers";
 import HeroSection from "@/components/landingpage/HeroSection";
-// import ScrollVideo from "@/components/ui/scrollvideo";
 import ProjectShowcase from "@/components/landingpage/ProjectShowcase";
 import StudioMission from "@/components/landingpage/StudioMission";
-import { motion, useScroll, useTransform } from "framer-motion";
-// import { useRef } from "react";
+import ScrollChapterHUD from "@/components/landingpage/ScrollChapterHUD";
+import ScrollRevealSection from "@/components/landingpage/ScrollRevealSection";
+import VelocityMarquee from "@/components/landingpage/VelocityMarquee";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 
 const HomePage = () => {
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  const smoothScroll = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 26,
+  });
+
+  const heroOpacity = useTransform(smoothScroll, [0, 0.22], [1, 0.15]);
+  const heroScale = useTransform(smoothScroll, [0, 0.22], [1, 0.96]);
+  const heroY = useTransform(smoothScroll, [0, 0.22], [0, -36]);
 
   return (
-    <>
-      <main className="overflow-x-hidden bg-[#020202]">
-        {/* Hero Section */}
-        <motion.div style={{ opacity: heroOpacity }} className="relative z-10">
+    <main className="overflow-x-clip bg-[#020202]">
+      <ScrollChapterHUD />
+
+      {/* Hero Section with smooth depth retreat on scroll */}
+      <section id="hero" className="relative z-10">
+        <motion.div
+          style={
+            prefersReducedMotion
+              ? undefined
+              : { opacity: heroOpacity, scale: heroScale, y: heroY }
+          }
+          className="will-change-[transform,opacity]"
+        >
           <HeroSection />
         </motion.div>
+      </section>
 
-    
+      {/* Scroll-velocity reactive studio ticker */}
+      <VelocityMarquee />
 
-        {/* Projects Showcase Section */}
-        <section className="relative z-30">
-          <ProjectShowcase />
-        </section>
+      {/* Projects Showcase Section */}
+      <ScrollRevealSection id="projects" className="z-30" showDivider={false}>
+        <ProjectShowcase />
+      </ScrollRevealSection>
 
-        {/* Studio Mission Section */}
-        <section className="relative z-40">
-          <StudioMission />
-        </section>
+      {/* Studio Mission Section */}
+      <ScrollRevealSection id="mission" className="z-40">
+        <StudioMission />
+      </ScrollRevealSection>
 
-        {/* Scroll Video Section - Disabled for now */}
-        {/* <section className="relative z-50 bg-[#020202]">
-          <ScrollVideo />
-        </section> */}
-
-        {/* Careers Section */}
-        <section className="relative z-60 bg-[#020202]">
-          <Careers />
-        </section>
-      </main>
-    </>
+      {/* Careers Section */}
+      <ScrollRevealSection id="careers" className="z-50 bg-[#020202]">
+        <Careers />
+      </ScrollRevealSection>
+    </main>
   );
 };
-
 
 export default HomePage;

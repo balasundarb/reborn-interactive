@@ -4,11 +4,33 @@ import { withDB } from '@/lib/mongodb'; // adjust path to your db file
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, description } = body;
+    const rawName = body?.name;
+    const rawEmail = body?.email;
+    const rawDescription = body?.description;
 
-    // Basic validation
+    if (
+      typeof rawName !== 'string' ||
+      typeof rawEmail !== 'string' ||
+      typeof rawDescription !== 'string'
+    ) {
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    }
+
+    const name = rawName.trim();
+    const email = rawEmail.trim().toLowerCase();
+    const description = rawDescription.trim();
+
     if (!name || !email || !description) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.length > 254 || !emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    if (name.length > 120 || description.length > 5000) {
+      return NextResponse.json({ error: 'Input exceeds maximum length' }, { status: 400 });
     }
 
     const result = await withDB(async (db) => {

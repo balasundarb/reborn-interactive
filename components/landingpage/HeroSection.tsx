@@ -89,6 +89,16 @@ const HeroSection: React.FC = () => {
     setVideoReady(true); // still mark ready to hide title
   }, []);
 
+  // Catch already-buffered/cached video before React hydration attached onCanPlay
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState >= 2) {
+      setVideoReady(true);
+    }
+    video.play().catch(() => {});
+  }, []);
+
   // Mouse parallax for title
   useEffect(() => {
     const mouse = { x: 0, y: 0 };
@@ -134,6 +144,7 @@ const HeroSection: React.FC = () => {
       alpha: Math.random() * 0.5, alphaDir: Math.random() > 0.5 ? 1 : -1,
     }));
 
+    let anim = 0;
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
       particles.forEach(p => {
@@ -147,9 +158,9 @@ const HeroSection: React.FC = () => {
         ctx.globalAlpha = 0.2 + Math.abs(Math.sin(Date.now() * 0.001)) * 0.3;
         ctx.drawImage(s, p.x - s.width / 2, p.y - s.height / 2);
       });
-      requestAnimationFrame(draw);
+      anim = requestAnimationFrame(draw);
     };
-    const anim = requestAnimationFrame(draw);
+    anim = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(anim);
       window.removeEventListener("resize", setSize);
@@ -192,6 +203,9 @@ const HeroSection: React.FC = () => {
         }
       `}</style>
 
+      {/* Preload hero video immediately */}
+      <link rel="preload" as="video" href="/video/Intro.webm" type="video/webm" />
+
       {/* Background Texture Overlay */}
       <div className="absolute inset-0 z-0 hero-bg-texture pointer-events-none" />
 
@@ -201,9 +215,12 @@ const HeroSection: React.FC = () => {
           ref={videoRef}
           autoPlay loop muted playsInline
           preload="auto"
+          poster="/assets/hero/intro.png"
+          onLoadedData={handleVideoReady}
           onCanPlay={handleVideoReady}
+          onPlaying={handleVideoReady}
           onError={handleVideoError}
-          className={`absolute z-20 inset-0 w-full h-full object-cover transition-opacity duration-1000 mask-video ${videoReady ? 'opacity-100' : 'opacity-0'
+          className={`absolute z-20 inset-0 w-full h-full object-cover transition-opacity duration-500 mask-video ${videoReady ? 'opacity-100' : 'opacity-0'
             }`}
         >
           <source src="/video/Intro.webm" type="video/webm" />

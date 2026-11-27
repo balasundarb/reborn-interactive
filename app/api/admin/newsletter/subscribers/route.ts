@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { withDB } from "@/lib/mongodb";
+import { requireAdminSession } from "@/lib/admin-auth";
 
 export async function GET() {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
   try {
     const subscribers = await withDB(async (db) => {
       const docs = await db
@@ -26,11 +30,20 @@ export async function GET() {
 }
 
 export async function DELETE(req: Request) {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
   try {
     const { id } = await req.json();
-    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    if (typeof id !== "string" || !id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
 
     const { ObjectId } = await import("mongodb");
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
+    }
+
     await withDB(async (db) => {
       await db.collection("newsletter").deleteOne({ _id: new ObjectId(id) });
     });

@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { token } = await req.json();
+  const body = await req.json();
+  const token = body?.token;
+
+  if (typeof token !== "string" || !token.trim()) {
+    return NextResponse.json({ success: false }, { status: 400 });
+  }
+
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secret) {
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
 
   const response = await fetch(
     "https://www.google.com/recaptcha/api/siteverify",
@@ -10,7 +20,7 @@ export async function POST(req: Request) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
- body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: new URLSearchParams({ secret, response: token.trim() }).toString(),
     }
   );
 

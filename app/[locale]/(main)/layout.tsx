@@ -3,7 +3,8 @@ import { MyNavbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from '@/components/layout/scrollToTop';
 import { VisitorTracker } from '@/components/layout/visitTracker';
-import NetflixRedTransition from '@/components/shared/NetflixRedTransition';
+import SmoothPageTransition from '@/components/shared/SmoothPageTransition';
+import SmoothScrollProvider from '@/components/shared/SmoothScrollProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -12,13 +13,14 @@ type Props = {
 export default function MainLayout({ children }: Props) {
   return (
     <NextIntlClientProvider>
-      <div className="relative w-full min-h-screen overflow-x-hidden">
+      <SmoothScrollProvider />
+      <div className="relative w-full min-h-screen overflow-x-clip">
         <VisitorTracker />
         <MyNavbar />
         <main>
-          {/* <NetflixRedTransition> */}
+          <SmoothPageTransition>
             {children}
-          {/* </NetflixRedTransition> */}
+          </SmoothPageTransition>
         </main>
         <Footer />
         <ScrollToTop />
