@@ -78,11 +78,11 @@ const Footer: React.FC = () => {
                     <div className="lg:col-span-4 space-y-5">
                         <div className="flex items-center gap-3.5 group">
                             <Link href={`/${locale}/login`} className="relative shrink-0">
-                                <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[6px] opacity-40 group-hover:opacity-75 transition-opacity" />
+                                <div className="absolute -inset-1 bg-[#d63031] rounded-full blur-[10px] opacity-30 group-hover:opacity-60 transition-opacity" />
                                 <img
-                                    src="/favicon-384x384.png"
+                                    src="/assets/navbar/Website.png"
                                     alt="Re-born Interactive"
-                                    className="relative h-11 w-11 object-contain brightness-110 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12"
+                                    className="relative h-12 w-auto object-contain brightness-110 transition-transform duration-500 group-hover:scale-105"
                                 />
                             </Link>
                             <h3 className="text-white font-black text-2xl tracking-tighter italic uppercase">

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reborninteractive.com";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.reborninteractive.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -50,21 +50,12 @@ export const metadata: Metadata = {
     title: "Re-born Interactive | Architecting Digital Emotions",
     description:
       "Independent game studio crafting atmospheric, story-driven, and next-gen interactive worlds.",
-    images: [
-      {
-        url: "/assets/game/through her eyes.png",
-        width: 1200,
-        height: 630,
-        alt: "Re-born Interactive — Through Her Eyes",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Re-born Interactive | Architecting Digital Emotions",
     description:
       "Independent game studio crafting atmospheric, story-driven, and next-gen interactive worlds.",
-    images: ["/assets/game/through her eyes.png"],
   },
   robots: {
     index: true,
@@ -93,7 +84,7 @@ const organizationJsonLd = {
   name: "Re-born Interactive",
   legalName: "Re-born Interactive Co., Ltd.",
   url: siteUrl,
-  logo: `${siteUrl}/favicon-384x384.png`,
+  logo: `${siteUrl}/assets/navbar/Website.png`,
   email: "info@reborninteractive.com",
   sameAs: [
     "https://x.com/RebornInte41311",
