@@ -113,16 +113,28 @@ const GAME_CATALOG: Record<string, GameDetail> = {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const game = GAME_CATALOG[slug];
   if (!game) {
-    return { title: "Game Not Found | Re-born Interactive" };
+    return { title: "Game Not Found" };
   }
   return {
-    title: `${game.title} | Re-born Interactive`,
+    title: game.title,
     description: game.description,
+    alternates: {
+      canonical: `/${locale}/games/${slug}`,
+    },
+    openGraph: {
+      title: `${game.title} | Re-born Interactive`,
+      description: game.description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${game.title} | Re-born Interactive`,
+      description: game.description,
+    },
   };
 }
 
