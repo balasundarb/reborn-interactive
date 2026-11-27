@@ -1,7 +1,15 @@
 // app/[locale]/(adminpanel)/layout.tsx
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 interface AdminPanelLayoutProps {
   children: React.ReactNode;

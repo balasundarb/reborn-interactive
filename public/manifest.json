@@ -1,7 +1,7 @@
 {
-  "name": "My App",
-  "description": "My App description",
-  "short_name": "My App",
+  "name": "Re-born Interactive",
+  "description": "Independent game studio architecting digital emotions and next-gen interactive worlds.",
+  "short_name": "Re-born",
   "icons": [
     {
       "src": "/favicon-72x72.png",
@@ -55,6 +55,6 @@
   "scope": "/",
   "start_url": "/?source=pwa",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "theme_color": "#050507",
+  "background_color": "#050507"
 }

@@ -1,12 +1,11 @@
 // app/api/admin/users/route.ts
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdminSession } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const reqHeaders = await headers();
-  const session = await auth.api.getSession({ headers: reqHeaders });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { error: authError, reqHeaders } = await requireAdminSession();
+  if (authError) return authError;
 
   try {
     // listUsers requires session headers to verify admin role

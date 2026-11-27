@@ -2,8 +2,12 @@
 import { MongoClient, Db } from 'mongodb';
 
 // Connection URI - use localhost for local MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || '';
-const DB_NAME = process.env.DB_NAME || '';
+const MONGODB_URI = (process.env.MONGODB_URI || '').trim();
+const DB_NAME = (process.env.DB_NAME || '').trim();
+
+export function isMongoConfigured(): boolean {
+    return MONGODB_URI.startsWith('mongodb://') || MONGODB_URI.startsWith('mongodb+srv://');
+}
 
 // Cache the connection in development to prevent multiple connections
 let cachedClient: MongoClient | null = null;
@@ -15,6 +19,10 @@ export async function connectDB(): Promise<Db> {
         if (cachedDb) {
             console.log('Using cached MongoDB connection');
             return cachedDb;
+        }
+
+        if (!isMongoConfigured()) {
+            throw new Error('MONGODB_URI is not configured');
         }
 
         console.log('Connecting to MongoDB...');

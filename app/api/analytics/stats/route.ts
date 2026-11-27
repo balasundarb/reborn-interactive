@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/mongodb";
+import { requireAdminSession } from "@/lib/admin-auth";
 import type { VisitorStats } from "@/types/visitor";
 
 export const runtime = "nodejs";
@@ -49,6 +50,9 @@ const REAL_VISIT = IS_DEV
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export async function GET(_req: NextRequest) {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
   try {
     const db     = await getDB();
     const visits = db.collection("site_visits");

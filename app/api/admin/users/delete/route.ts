@@ -1,12 +1,11 @@
 // app/api/admin/users/delete/route.ts
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdminSession } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(req: NextRequest) {
-  const reqHeaders = await headers();
-  const session = await auth.api.getSession({ headers: reqHeaders });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { error: authError, session, reqHeaders } = await requireAdminSession();
+  if (authError || !session) return authError!;
 
   const { userId } = await req.json();
 

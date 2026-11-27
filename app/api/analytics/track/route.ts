@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import { getDB } from "@/lib/mongodb";
+import { getDB, isMongoConfigured } from "@/lib/mongodb";
 import {
   getClientIP,
   getGeoInfo,
@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
     // ── Basic validation ──────────────────────────────────────────────────
     if (!sessionId || !isValidUUID(sessionId)) {
       return NextResponse.json({ error: "Invalid session ID" }, { status: 400 });
+    }
+
+    if (!isMongoConfigured()) {
+      return NextResponse.json({ ok: false, skipped: true });
     }
 
     const db        = await getDB();
