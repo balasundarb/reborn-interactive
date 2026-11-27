@@ -11,7 +11,7 @@ export const contentType = "image/png";
 
 export default async function OpenGraphImage() {
   const logoBuffer = await readFile(
-    path.join(process.cwd(), "public", "assets", "navbar", "Website.png")
+    path.join(process.cwd(), "public", "favicon-384x384.png")
   );
   const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
@@ -27,30 +27,31 @@ export default async function OpenGraphImage() {
           justifyContent: "center",
           backgroundColor: "#050507",
           backgroundImage:
-            "radial-gradient(circle at 50% 45%, rgba(214, 48, 49, 0.25) 0%, rgba(5, 5, 7, 1) 65%)",
-          position: "relative",
+            "radial-gradient(circle at 50% 42%, rgba(214, 48, 49, 0.28) 0%, rgba(5, 5, 7, 1) 68%)",
         }}
       >
         <img
           src={logoBase64}
           alt="Re-born Interactive"
+          width={290}
+          height={290}
           style={{
-            width: 480,
-            height: "auto",
+            width: 290,
+            height: 290,
             objectFit: "contain",
           }}
         />
         <div
           style={{
-            marginTop: 28,
-            fontSize: 22,
-            letterSpacing: "0.35em",
+            marginTop: 22,
+            fontSize: 42,
+            fontWeight: 900,
+            letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: "#d4d4d8",
-            fontWeight: 700,
+            color: "#ffffff",
           }}
         >
-          Architecting Digital Emotions
+          RE-BORN INTERACTIVE
         </div>
       </div>
     ),
